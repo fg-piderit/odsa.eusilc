@@ -4,7 +4,7 @@
 \alias{expandir_eusilc}
 \title{Title}
 \usage{
-expandir_eusilc(.datos, .base = c("H", "P"), ...)
+expandir_eusilc(.datos, .base, ...)
 }
 \arguments{
 \item{.datos}{descripcion}

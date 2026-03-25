@@ -4,14 +4,14 @@
 construir_variables_p <- function(.datos, .pais, ...) {
   .datos <- .datos |>
     dplyr::mutate(
-      # Bloque I
+      # Bloque I -----------------------
       pi01 = PB010,
       pi02 = PB020,
       pi03 = "base D",
       pi04 = PX030,
       pi05 = PB030,
       pi06 = PB040,
-      # Bloque D
+      # Bloque D -----------------------
       pd01 = "base R",
       pd02 = PB150,
       pd03 = dplyr::case_when(
@@ -30,7 +30,7 @@ construir_variables_p <- function(.datos, .pais, ...) {
       ),
       pd04 = "base R",
       pd05 = "base R",
-      # Bloque L
+      # Bloque L -----------------------
       PSH  = "a definir",
       pl02 = dplyr::case_when(
         PL032 == 1 ~ 1,
@@ -69,19 +69,50 @@ construir_variables_p <- function(.datos, .pais, ...) {
       ),
       pl09a = "Modulo LMH",
       pl09b = "Modulo LMH",
-      pl10 = dplyr::case_when(
+      .pl10 = dplyr::case_when(
         PL051A %in% c(1, 11:26) ~ 1,
-        PL040A == 1 ~ 2,
-        PL040A == 2 ~ 5,
-        PL150 == 1 ~ 6,
         PL051A %in% c(2, 31:35) ~ 3,
         PL051A %in% c(3, 41:44) ~ 4,
-        PL051A %in% c(51:54) ~ 5,
+        PL051A %in%   51:54 ~ 5,
         PL051A %in% c(61, 62, 92) ~ 10,
-        PL051A %in% c(71:83) ~ 8,
+        PL051A %in%   71:83 ~ 8,
         PL051A %in% c(91, 93:96) ~ 9,
         .default = NA
       ),
+      pl10 = dplyr::replace_when(
+        x = .pl10,
+        .pl10 == 8 & PL040A != 1 ~ 8,
+        .pl10 > 1 & PL040A == 1 ~ 2,
+        .pl10 > 1 & PL040A == 2 ~ 6,
+        .pl10 > 1 & is.na(PL040A) ~ NA,
+        .pl10 > 2 & PL150 == 1 ~ 7,
+        .pl10 > 2 & is.na(PL150) ~ NA
+      ),
+      informalidad = "a definir",
+      informalidad4 = "a definir",
+      # Bloque Y -----------------------
+      .py01 = "Depende de modulo LMH",
+      .py02 = "Depende de modulo LMH",
+      .py03 = "Depende de modulo LMH",
+      .py04 = PY010N,
+      .py05 = PY050N,
+      .py06 = PY100N,
+      .py07 = PY080N,
+      .py08 = PY090N,
+      .py09 = PY110N + PY120N + PY130N + PY140N,
+      .py10 = .py06 + .py07,
+      .py11 = .py04 + .py05,
+      .py12 = .py08 + .py09 + .py10,
+      .py13 = .py11 + .py12,
+      .haa = (PL073 + PL074) * PL060 * 4.2,
+      .han = (PL075 + PL076) * PL060 * 4.2,
+      py01h = "Depende de modulo LMH",
+      py02h = "Depende de modulo LMH",
+      py03h = "Depende de modulo LMH",
+      py04h = .py04 / .haa,
+      py05h = .py05 / .han,
+      dplyr::across(.py04:.py13, \(y) y / 12, .names = "{.col}m"),
+      pyxxp = "py01 a py13 (h y m) / PPA correspondiente",
       .keep = "none"
     )
   # ------------------------------------------

@@ -9,7 +9,7 @@
 expandir_eusilc <- function(
     .datos,
     #.tipo = c("cross", "long"),
-    .base = c("H", "P"),
+    .base,
     ...
     #.individuos = NULL
 ) {
@@ -18,7 +18,7 @@ expandir_eusilc <- function(
     rlang::abort("`.datos` debe ser un data.frame o tibble")
   }
   #.tipo <- rlang::arg_match(.tipo)
-  .base <- rlang::arg_match(.base)
+  .base <- rlang::arg_match(.base, c("P", "H"))
 
   variables <- names(.datos)
   tipos_var <- purrr::map_chr(.datos, class)
