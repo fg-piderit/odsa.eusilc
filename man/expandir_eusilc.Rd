@@ -4,7 +4,7 @@
 \alias{expandir_eusilc}
 \title{Title}
 \usage{
-expandir_eusilc(.datos, .base, ...)
+expandir_eusilc(.datos, .base, ..., .individuos = NULL)
 }
 \arguments{
 \item{.datos}{descripcion}
@@ -12,6 +12,8 @@ expandir_eusilc(.datos, .base, ...)
 \item{.base}{descripcion}
 
 \item{...}{descripcion}
+
+\item{.individuos}{descripcion}
 }
 \value{
 valor
