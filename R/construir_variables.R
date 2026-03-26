@@ -91,32 +91,108 @@ construir_variables_p <- function(.datos, .pais, ...) {
       informalidad = "a definir",
       informalidad4 = "a definir",
       # Bloque Y -----------------------
-      .py01 = "Depende de modulo LMH",
-      .py02 = "Depende de modulo LMH",
-      .py03 = "Depende de modulo LMH",
-      .py04 = PY010N,
-      .py05 = PY050N,
-      .py06 = PY100N,
-      .py07 = PY080N,
-      .py08 = PY090N,
-      .py09 = PY110N + PY120N + PY130N + PY140N,
-      .py10 = .py06 + .py07,
-      .py11 = .py04 + .py05,
-      .py12 = .py08 + .py09 + .py10,
-      .py13 = .py11 + .py12,
+      py01 = "Depende de modulo LMH",
+      py02 = "Depende de modulo LMH",
+      py03 = "Depende de modulo LMH",
+      py04 = PY010N,
+      py05 = PY050N,
+      py06 = PY100N,
+      py07 = PY080N,
+      py08 = PY090N,
+      py09 = PY110N + PY120N + PY130N + PY140N,
+      py10 = py06 + py07,
+      py11 = py04 + py05,
+      py12 = py08 + py09 + py10,
+      py13 = py11 + py12,
       .haa = (PL073 + PL074) * PL060 * 4.2,
       .han = (PL075 + PL076) * PL060 * 4.2,
       py01h = "Depende de modulo LMH",
       py02h = "Depende de modulo LMH",
       py03h = "Depende de modulo LMH",
-      py04h = .py04 / .haa,
-      py05h = .py05 / .han,
-      dplyr::across(.py04:.py13, \(y) y / 12, .names = "{.col}m"),
-      pyxxp = "py01 a py13 (h y m) / PPA correspondiente",
+      py04h = py04 / .haa,
+      py05h = py05 / .han,
+      dplyr::across(py04:py13, \(y) y / 12, .names = "{.col}m"),
+      pyxxq = "py01 a py13 (h y m) / PPA correspondiente",
       .keep = "none"
     )
   # ------------------------------------------
   return(.datos)
 }
 
-# construir variables_h ------------------------------------------------------
+# construir_variables_h ------------------------------------------------------
+construir_variables_h <- function(.datos, .pais, .ind, ...) {
+  hogares <- .datos |>
+    dplyr::mutate(
+      # Bloque I -----------------------
+      hi01 = HB010,
+      hi02 = HB020,
+      hi03 = "Base D",
+      hi04 = HB030,
+      hi06 = "Base D",
+      # Bloque D -----------------------
+      hd01 = HX040,
+      thogara = "A definir",
+      thogarb = "A definir",
+      # Bloque L -----------------------
+      # Bloque Y -----------------------
+      hy14 = HY040N + HY090N,
+      hy15 = HY050N + HY060N + HY070N,
+      hy16 = HY080N + HY110N,
+      hy17 = hy14 + hy16,
+      dplyr::across(hy14:hy17, \(y) y / 12, .names = "{.col}m"),
+      .keep = "none"
+    )
+
+  individuos <- .ind |>
+    dplyr::summarise(
+      # Bloque Y -----------------------
+      hy01p = "Depende de modulo LMH",
+      hy02p = "Depende de modulo LMH",
+      hy03p = "Depende de modulo LMH",
+      hy04p = sum(py04),
+      hy05p = sum(py05),
+      hy06p = sum(py06),
+      hy07p = sum(py07),
+      hy08p = sum(py08),
+      hy09p = sum(py09),
+      hy10p = sum(py10),
+      hy11p = sum(py11),
+      hy12p = sum(py12),
+      hy13p = sum(py13),
+      # Bloque P -----------------------
+      hp01 = "Depende de modulo LMH",
+      hp02 = "Depende de modulo LMH",
+      hp03 = "Depende de modulo LMH",
+      hp04 = sum(py04 != 0),
+      hp05 = sum(py05 != 0),
+      hp06 = sum(py06 != 0),
+      hp07 = sum(py07 != 0),
+      hp08 = sum(py08 != 0),
+      hp09 = sum(py09 != 0),
+      hp10 = sum(py10 != 0),
+      hp11 = sum(py11 != 0),
+      hp12 = sum(py12 != 0),
+      hp13 = sum(py13 != 0),
+      .by = c(pi01, pi02, pi04)
+    )
+
+  hogares |>
+    dplyr::left_join(
+      individuos, by = dplyr::join_by(hi01 == pi01, hi02 == pi02, hi04 == pi04)
+    ) |>
+    dplyr::mutate(
+      hy18 = hy08p + hy09p + hy15,
+      hy19 = hy10p + hy18,
+      hy20 = hy12p + hy14 + hy15 + hy16,
+      hy21 = hy13p + hy14 + hy15 + hy16,
+      dplyr::across(
+        .cols = c(hy04p:hy13p, hy14:hy17, hy18:hy21),
+        .fns = \(y) y / 12, .names = "{.col}m"
+      ),
+      dplyr::across(
+        .cols = c(hy04p:hy13p, hy14:hy17, hy18:hy21),
+        .fns = \(y) y / hd01, .names = "{.col}c"
+      ),
+      hyxxq = "hy01p a hy21 / PPA correspondiente"
+    )
+}

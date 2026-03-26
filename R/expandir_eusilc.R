@@ -10,8 +10,8 @@ expandir_eusilc <- function(
     .datos,
     #.tipo = c("cross", "long"),
     .base,
-    ...
-    #.individuos = NULL
+    ...,
+    .individuos = NULL
 ) {
   # Chequeos ---------------------------------
   if (!is.data.frame(.datos)) {
@@ -20,26 +20,10 @@ expandir_eusilc <- function(
   #.tipo <- rlang::arg_match(.tipo)
   .base <- rlang::arg_match(.base, c("P", "H"))
 
-  variables <- names(.datos)
-  tipos_var <- purrr::map_chr(.datos, class)
-
   if (.base == "P") {
-    if (any(!(c("PB010", "PB020") %in% variables))) {
-      rlang::abort("Falta `PB010` o `PB020` (pais).")
-    }
-    if (!(tipos_var["PB010"] %in% c("numeric", "integer"))) {
-      rlang::abort("`PB010` debe ser numerica.")
-    }
-
-    anno <- unique(.datos$PB010)
-    pais <- unique(.datos$PB020)
-    chequear_pais_anno(pais, anno)
-    chequear_variables(variables, tipos_var, necesarias_p[[as.character(anno)]])
-
     .datos <- construir_variables_p(.datos, .pais)
   } else {
-    #TODO
-    rlang::warn("Todavia no prepare nada para las bases H")
+    .datos <- construir_variables_h(.datos, .pais, .individuos)
   }
   #if (.base == "H" & is.null(.individuos)) {
   #  mensaje <- paste0("Para expandir la base tipo `H` se debe proveer `.individuos`.\n",
