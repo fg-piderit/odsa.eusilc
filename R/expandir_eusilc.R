@@ -33,11 +33,14 @@ expandir_eusilc <- function(
     if (is.null(.individuos)) {
       rlang::abort("Para expandir la base tipo `H` se debe proveer `.individuos`.")
     }
-    if (!attr(.individuos, "expandida") | attr(.individuos, "base") != "P") {
+    if (is.null(attr(.individuos, "expandida"))) {
+      rlang::abort("`.individuos` debe ser una base P expandida con `expandir_eusilc().`")
+    }
+    if (attr(.individuos, "base") != "P") {
       rlang::abort("`.individuos` debe ser una base P expandida con `expandir_eusilc().`")
     }
 
-    .datos <- construir_variables_h(.datos, .pais, .individuos)
+    .datos <- construir_variables_h(.datos, .pais, .individuos, .mantener = .mantener)
 
   }
 

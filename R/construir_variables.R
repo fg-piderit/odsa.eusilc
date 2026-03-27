@@ -166,7 +166,7 @@ construir_variables_p <- function(.datos, .pais, .lmh, ..., .mantener = FALSE) {
 }
 
 # construir_variables_h ------------------------------------------------------
-construir_variables_h <- function(.datos, .pais, .ind, ...) {
+construir_variables_h <- function(.datos, .pais, .ind, ..., .mantener = FALSE) {
   hogares <- .datos |>
     dplyr::mutate(
       # Bloque I -----------------------
@@ -186,49 +186,32 @@ construir_variables_h <- function(.datos, .pais, .ind, ...) {
       hy16 = HY080N + HY110N,
       hy17 = hy14 + hy16,
       dplyr::across(hy14:hy17, \(y) y / 12, .names = "{.col}m"),
-      .keep = "none"
+      .keep = "all"
     )
 
   individuos <- .ind |>
     dplyr::summarise(
       # Bloque Y -----------------------
-      hy04p = sum(py04),
-      hy05p = sum(py05),
-      hy06p = sum(py06),
-      hy07p = sum(py07),
-      hy08p = sum(py08),
-      hy09p = sum(py09),
-      hy10p = sum(py10),
-      hy11p = sum(py11),
-      hy12p = sum(py12),
-      hy13p = sum(py13),
+      dplyr::across(py04:py13, sum, .names = "{.col}p"),
       # Bloque P -----------------------
-      hp04 = sum(py04 != 0),
-      hp05 = sum(py05 != 0),
-      hp06 = sum(py06 != 0),
-      hp07 = sum(py07 != 0),
-      hp08 = sum(py08 != 0),
-      hp09 = sum(py09 != 0),
-      hp10 = sum(py10 != 0),
-      hp11 = sum(py11 != 0),
-      hp12 = sum(py12 != 0),
-      hp13 = sum(py13 != 0),
+      dplyr::across(py04:py13, \(y) sum(y != 0), .names = "x{.col}"),
       .by = c(pi01, pi02, pi04)
-    )
+    ) |>
+    rename_with(.cols = dplyr::starts_with("py"), .fn = \(n) sub("py", "hy", n)) |>
+    rename_with(.cols = dplyr::starts_with("xpy"), .fn = \(n) sub("xpy", "hp", n))
+
 
   if (attr(.ind, "LMH")) {
     individuos_lmh <- .ind |>
       dplyr::summarise(
         # Bloque Y -----------------------
-        hy01p = "Depende de modulo LMH",
-        hy02p = "Depende de modulo LMH",
-        hy03p = "Depende de modulo LMH",
+        across(py01:py03, sum, .names = "{.col}p"),
         # Bloque P -----------------------
-        hp01 = "Depende de modulo LMH",
-        hp02 = "Depende de modulo LMH",
-        hp03 = "Depende de modulo LMH",
+        across(py01:py03, \(y) sum(y != 0), .names = "x{.col}"),
         .by = c(pi01, pi02, pi04)
-      )
+      ) |>
+      rename_with(.cols = dplyr::starts_with("py"), .fn = \(n) sub("py", "hy", n)) |>
+      rename_with(.cols = dplyr::starts_with("xpy"), .fn = \(n) sub("xpy", "hp", n))
 
     individuos <- individuos |>
       left_join(individuos_lmh, by = join_by(pi01, pi02, pi04))
@@ -251,6 +234,12 @@ construir_variables_h <- function(.datos, .pais, .ind, ...) {
         .cols = c(hy04p:hy13p, hy14:hy17, hy18:hy21),
         .fns = \(y) y / hd01, .names = "{.col}c"
       ),
-      hyxxq = "hy01p a hy21 / PPA correspondiente"
+      hyxxq = "hy01p a hy21 / PPA correspondiente",
+      .keep = "all"
     )
+
+  if (!.mantener) hogares <- hogares |> select(-all_of(names(.datos)))
+
+  # ------------------------------------------
+  return(hogares)
 }
