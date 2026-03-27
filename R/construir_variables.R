@@ -1,7 +1,7 @@
 # Funciones para construir las variables de las bases finales
 #
 # construir variables_p ------------------------------------------------------
-construir_variables_p <- function(.datos, .pais, .lmh, ...) {
+construir_variables_p <- function(.datos, .pais, .lmh, ..., .mantener = FALSE) {
   datos <- .datos |>
     dplyr::mutate(
       # Bloque I -----------------------
@@ -64,6 +64,11 @@ construir_variables_p <- function(.datos, .pais, .lmh, ...) {
         PL051A %/% 10 == 9 ~ 4,
         .default = NA
       ),
+      pl08b = dplyr::case_when(
+        PL051A == 2 | (PL051A >= 20 & PL051A <= 35) ~ 1,
+        !is.na(PL051A) ~ 2,
+        .default = NA
+      ),
       .pl10 = dplyr::case_when(
         PL051A %in% c(1, 11:26) ~ 1,
         PL051A %in% c(2, 31:35) ~ 3,
@@ -102,28 +107,59 @@ construir_variables_p <- function(.datos, .pais, .lmh, ...) {
       py05h = py05 / .han,
       dplyr::across(py04:py13, \(y) y / 12, .names = "{.col}m"),
       pyxxq = "py01 a py13 (h y m) / PPA correspondiente",
-      .keep = "none"
+      .keep = "all"
     )
 
   if (.lmh) {
-    lmh <- .datos |>
+    datos <- datos |>
       dplyr::mutate(
-        pl06a = "Modulo LMH",
-        pl06b = "Modulo LMH",
-        pl07 = "Modulo LMH",
-        pl09a = "Modulo LMH",
-        pl09b = "Modulo LMH",
-        py01 = "Depende de modulo LMH",
-        py02 = "Depende de modulo LMH",
-        py03 = "Depende de modulo LMH",
-        py01h = "Depende de modulo LMH",
-        py02h = "Depende de modulo LMH",
-        py03h = "Depende de modulo LMH",
-        .keep = "none"
+        # Bloque L -----------------------
+        pl06a = dplyr::case_when(
+          PL130 <= 5 ~ 1,
+          PL130 > 5 & PL130 <= 9 ~ 2,
+          PL130 > 9 & PL130 <= 11 ~ 3,
+          PL130 > 11 & PL130 <= 13 ~ 4,
+          .default = NA
+        ),
+        pl06b = dplyr::case_when(
+          PL130 <= 5 ~ 1,
+          PL130 > 5 & PL130 <= 11 ~ 2,
+          PL130 > 11 & PL130 <= 13 ~ 3,
+          .default = NA
+        ),
+        pl07 = dplyr::case_when(
+          PL230 == 1 ~ 1,
+          PL230 == 2 ~ 2,
+          .default = NA
+        ),
+        pl09a = dplyr::case_when(
+          PL040A == 1 & pl07 == 2 & pl06b > 1 ~ 1,
+          PL040A == 2 & pl07 == 2 & pl08b == 1 ~ 2,
+          pl02 == 1 & pl07 == 1 ~ 3,
+          PL040A == 3 & pl07 == 2 & pl06b == 3 ~ 4,
+          PL040A == 3 & pl07 == 2 & pl06b == 2 ~ 5,
+          PL040A == 1 & pl07 == 2 & pl06b == 1 ~ 6,
+          PL040A == 2 & pl07 == 2 & pl08b == 2 ~ 7,
+          PL040A == 3 & pl07 == 2 & pl06b == 1 ~ 8,
+          pl02 == 1 & pl05 == 8 ~ 9,
+          .default = NA
+        ),
+        pl09b = dplyr::case_when(
+          pl09a == 3 ~ 1,
+          pl09a %in% c(1, 2, 4, 5, 9) ~ 2,
+          pl09a %in% c(7, 8) ~ 3,
+          .default = NA
+        ),
+        # Bloque Y -----------------------
+        py01 = dplyr::if_else(py11 != 0 & pl09b == 1, py11, 0),
+        py02 = dplyr::if_else(py11 != 0 & pl09b == 2, py11, 0),
+        py03 = dplyr::if_else(py11 != 0 & pl09b == 3, py11, 0),
+        across(py01:py03, \(y) y / .haa, .names = "{.col}h"),
+        .keep = "all"
       )
-
-    datos <- dplyr::bind_cols(datos, lmh)
   }
+
+  if (!.mantener) datos <- datos |> select(-all_of(names(.datos)))
 
   # ------------------------------------------
   return(datos)

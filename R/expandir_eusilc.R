@@ -4,6 +4,7 @@
 #' @param .base descripcion
 #' @param ... descripcion
 #' @param .individuos descripcion
+#' @param .mantener descripcion
 #'
 #' @returns valor
 #' @export
@@ -11,7 +12,8 @@ expandir_eusilc <- function(
     .datos,
     .base,
     ...,
-    .individuos = NULL
+    .individuos = NULL,
+    .mantener = FALSE
 ) {
   if (!is.data.frame(.datos)) {
     rlang::abort("`.datos` debe ser un data.frame o tibble")
@@ -23,7 +25,7 @@ expandir_eusilc <- function(
     modulo_lmh <- all(vars_lmh %in% names(.datos))
     if (!modulo_lmh) rlang::warn("No se encontro `PL130` o `PL230`.\nSe omiten las variables que dependen de ellas")
 
-    .datos <- construir_variables_p(.datos, .pais, modulo_lmh)
+    .datos <- construir_variables_p(.datos, .pais, modulo_lmh, .mantener = .mantener)
     attr(.datos, "LMH") <- modulo_lmh
 
   } else {
