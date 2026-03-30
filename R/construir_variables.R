@@ -159,7 +159,7 @@ construir_variables_p <- function(.datos, .pais, .lmh, ..., .mantener = FALSE) {
       )
   }
 
-  if (!.mantener) datos <- datos |> select(-all_of(names(.datos)))
+  if (!.mantener) datos <- datos |> dplyr::select(-dplyr::all_of(names(.datos)))
 
   # ------------------------------------------
   return(datos)
@@ -189,35 +189,32 @@ construir_variables_h <- function(.datos, .pais, .ind, ..., .mantener = FALSE) {
       .keep = "all"
     )
 
-  individuos <- .ind |>
-    dplyr::summarise(
-      # Bloque Y -----------------------
-      dplyr::across(py04:py13, sum, .names = "{.col}p"),
-      # Bloque P -----------------------
-      dplyr::across(py04:py13, \(y) sum(y != 0), .names = "x{.col}"),
-      .by = c(pi01, pi02, pi04)
-    ) |>
-    rename_with(.cols = dplyr::starts_with("py"), .fn = \(n) sub("py", "hy", n)) |>
-    rename_with(.cols = dplyr::starts_with("xpy"), .fn = \(n) sub("xpy", "hp", n))
-
-
   if (attr(.ind, "LMH")) {
-    individuos_lmh <- .ind |>
+    individuos <- .ind |>
       dplyr::summarise(
         # Bloque Y -----------------------
-        across(py01:py03, sum, .names = "{.col}p"),
+        across(c(py01:py03, py04:py13), sum, .names = "{.col}p"),
         # Bloque P -----------------------
-        across(py01:py03, \(y) sum(y != 0), .names = "x{.col}"),
+        across(c(py01:py03, py04:py13), \(y) sum(y != 0), .names = "x{.col}"),
         .by = c(pi01, pi02, pi04)
-      ) |>
-      rename_with(.cols = dplyr::starts_with("py"), .fn = \(n) sub("py", "hy", n)) |>
-      rename_with(.cols = dplyr::starts_with("xpy"), .fn = \(n) sub("xpy", "hp", n))
-
-    individuos <- individuos |>
-      left_join(individuos_lmh, by = join_by(pi01, pi02, pi04))
+      )
+  } else {
+    individuos <- .ind |>
+      dplyr::summarise(
+        # Bloque Y -----------------------
+        dplyr::across(py04:py13, sum, .names = "{.col}p"),
+        # Bloque P -----------------------
+        dplyr::across(py04:py13, \(y) sum(y != 0), .names = "x{.col}"),
+        .by = c(pi01, pi02, pi04)
+      )
   }
 
-  hogares |>
+  individuos <- individuos |>
+    dplyr::rename_with(.cols = dplyr::starts_with("py"), .fn = \(n) sub("py", "hy", n)) |>
+    dplyr::rename_with(.cols = dplyr::starts_with("xpy"), .fn = \(n) sub("xpy", "hp", n))
+
+
+  hogares <- hogares |>
     dplyr::left_join(
       individuos, by = dplyr::join_by(hi01 == pi01, hi02 == pi02, hi04 == pi04)
     ) |>
@@ -238,7 +235,23 @@ construir_variables_h <- function(.datos, .pais, .ind, ..., .mantener = FALSE) {
       .keep = "all"
     )
 
-  if (!.mantener) hogares <- hogares |> select(-all_of(names(.datos)))
+  if (attr(.ind, "LMH")) {
+    hogares <- hogares |>
+      dplyr::mutate(
+        dplyr::across(
+          .cols = c(hy01p:hy03p),
+          .fns = \(y) y / 12, .names = "{.col}m"
+        ),
+        dplyr::across(
+          .cols = c(hy01p:hy03p),
+          .fns = \(y) y / hd01, .names = "{.col}c"
+        ),
+        hyxxq = "hy01p a hy03p / PPA correspondiente",
+        .keep = "all"
+      )
+  }
+
+  if (!.mantener) hogares <- hogares |> dplyr::select(-dplyr::all_of(names(.datos)))
 
   # ------------------------------------------
   return(hogares)

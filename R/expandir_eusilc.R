@@ -15,10 +15,12 @@ expandir_eusilc <- function(
     .individuos = NULL,
     .mantener = FALSE
 ) {
-  if (!is.data.frame(.datos)) {
-    rlang::abort("`.datos` debe ser un data.frame o tibble")
-  }
+  if (!is.data.frame(.datos)) rlang::abort("`.datos` debe ser un data.frame o tibble")
   .base <- rlang::arg_match(.base, c("P", "H"))
+
+  attr(.datos, "expandida") <- TRUE
+  attr(.datos, "base") <- .base
+  attr(.datos, "LMH") <- FALSE
 
   if (.base == "P") {
 
@@ -40,13 +42,13 @@ expandir_eusilc <- function(
       rlang::abort("`.individuos` debe ser una base P expandida con `expandir_eusilc().`")
     }
 
+    modulo_lmh <- attr(.individuos, "LMH")
+    if (!modulo_lmh) rlang::warn("No se encontro `PL130` o `PL230` en `.individuos`.\nSe omiten las variables que dependen de ellas")
+
     .datos <- construir_variables_h(.datos, .pais, .individuos, .mantener = .mantener)
 
   }
 
   # ------------------------------------------
-  attr(.datos, "expandida") <- TRUE
-  attr(.datos, "base") <- .base
-
   return(.datos)
 }
