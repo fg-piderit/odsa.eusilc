@@ -2,22 +2,33 @@
 % Please edit documentation in R/expandir_eusilc.R
 \name{expandir_eusilc}
 \alias{expandir_eusilc}
-\title{Title}
+\title{Construir variables adicionales en los conjuntos de datos de la EU-SILC}
 \usage{
-expandir_eusilc(.datos, .base, ..., .individuos = NULL, .mantener = FALSE)
+expandir_eusilc(
+  .datos,
+  .base,
+  .pais,
+  ...,
+  .individuos = NULL,
+  .mantener = FALSE
+)
 }
 \arguments{
-\item{.datos}{descripcion}
+\item{.datos}{Conjunto de datos de la EU-SILC. Debe ser el conjunto P o el conjunto H.}
 
-\item{.base}{descripcion}
+\item{.base}{El tipo de conjunto de datos. Debe ser P o H.}
 
-\item{...}{descripcion}
+\item{.pais}{El pais al que corresponde el conjunto de datos.}
 
-\item{.individuos}{descripcion}
+\item{...}{...}
+
+\item{.individuos}{Conjunto de datos P expandido por \code{expandir_eusilc()}. Sólo si \code{.base} es H.}
+
+\item{.mantener}{Conservar las variables originales en el conjunto de datos final o eliminarlas.}
 }
 \value{
-valor
+Conjunto de datos de la EU-SILC con variables adicionales de uso habitual.
 }
 \description{
-Title
+Construir variables adicionales en los conjuntos de datos de la EU-SILC
 }

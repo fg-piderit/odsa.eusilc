@@ -1,18 +1,16 @@
 # Funciones para construir las variables de las bases finales
 #
 # construir variables_p ------------------------------------------------------
-construir_variables_p <- function(.datos, .pais, .lmh, ..., .mantener = FALSE) {
+construir_variables_p <- function(.datos, .pais, .bloques, ..., .mantener = FALSE) {
   datos <- .datos |>
     dplyr::mutate(
       # Bloque I -----------------------
       pi01 = PB010,
       pi02 = PB020,
-      pi03 = "base D",
       pi04 = PX030,
       pi05 = PB030,
       pi06 = PB040,
       # Bloque D -----------------------
-      pd01 = "base R",
       pd02 = PB150,
       pd03 = dplyr::case_when(
         PE041 == 0   ~ 1,
@@ -28,10 +26,8 @@ construir_variables_p <- function(.datos, .pais, .lmh, ..., .mantener = FALSE) {
         PE041 == 500 ~ 6,
         .default = NA
       ),
-      pd04 = "base R",
-      pd05 = "base R",
       # Bloque L -----------------------
-      PSH  = "a definir",
+      pl01 = "a definir",
       pl02 = dplyr::case_when(
         PL032 == 1 ~ 1,
         PL032 == 2 ~ 2,
@@ -88,8 +84,8 @@ construir_variables_p <- function(.datos, .pais, .lmh, ..., .mantener = FALSE) {
         .pl10 > 2 & PL150 == 1 ~ 7,
         .pl10 > 2 & is.na(PL150) ~ NA
       ),
-      informalidad = "a definir",
-      informalidad4 = "a definir",
+      pl11a = "a definir",
+      pl11b = "a definir",
       # Bloque Y -----------------------
       py04 = PY010N,
       py05 = PY050N,
@@ -110,7 +106,22 @@ construir_variables_p <- function(.datos, .pais, .lmh, ..., .mantener = FALSE) {
       .keep = "all"
     )
 
-  if (.lmh) {
+  if (.bloques["D"]) {
+    datos <- datos |>  dplyr::mutate(pi03 = DB040, .keep = "all")
+  }
+
+  if (.bloques["R"]) {
+    datos <- datos |>
+      dplyr::mutate(
+        pd01a = RB082,
+        pd01b = RB081,
+        pd04 = dplyr::if_else(RB280 == .pais, 1, 2),
+        pd05 = dplyr::if_else(RB290 == .pais, 1, 2),
+        .keep = "all"
+      )
+  }
+
+  if (.bloques["LMH"]) {
     datos <- datos |>
       dplyr::mutate(
         # Bloque L -----------------------
@@ -172,7 +183,6 @@ construir_variables_h <- function(.datos, .pais, .ind, ..., .mantener = FALSE) {
       # Bloque I -----------------------
       hi01 = HB010,
       hi02 = HB020,
-      hi03 = "Base D",
       hi04 = HB030,
       hi06 = "Base D",
       # Bloque D -----------------------
@@ -189,14 +199,14 @@ construir_variables_h <- function(.datos, .pais, .ind, ..., .mantener = FALSE) {
       .keep = "all"
     )
 
-  if (attr(.ind, "LMH")) {
+  if (attr(.ind, "bloques")["LMH"]) {
     individuos <- .ind |>
       dplyr::summarise(
         # Bloque Y -----------------------
         across(c(py01:py03, py04:py13), sum, .names = "{.col}p"),
         # Bloque P -----------------------
         across(c(py01:py03, py04:py13), \(y) sum(y != 0), .names = "x{.col}"),
-        .by = c(pi01, pi02, pi04)
+        .by = any_of(c("pi01", "pi02", "pi03", "pi04"))
       )
   } else {
     individuos <- .ind |>
@@ -205,7 +215,7 @@ construir_variables_h <- function(.datos, .pais, .ind, ..., .mantener = FALSE) {
         dplyr::across(py04:py13, sum, .names = "{.col}p"),
         # Bloque P -----------------------
         dplyr::across(py04:py13, \(y) sum(y != 0), .names = "x{.col}"),
-        .by = c(pi01, pi02, pi04)
+        .by = any_of(c("pi01", "pi02", "pi03", "pi04"))
       )
   }
 
@@ -235,7 +245,7 @@ construir_variables_h <- function(.datos, .pais, .ind, ..., .mantener = FALSE) {
       .keep = "all"
     )
 
-  if (attr(.ind, "LMH")) {
+  if (attr(.ind, "bloques")["LMH"]) {
     hogares <- hogares |>
       dplyr::mutate(
         dplyr::across(
