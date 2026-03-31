@@ -79,14 +79,15 @@ construir_vbles_p <- function(
         PL051A %in% c(91, 93:96) ~ 9,
         .default = NA
       ),
-      pl10 = dplyr::replace_when(
+      pl10 = dplyr::case_when(
         x = .pl10,
         .pl10 == 8 & PL040A != 1 ~ 8,
         .pl10 > 1 & PL040A == 1 ~ 2,
         .pl10 > 1 & PL040A == 2 ~ 6,
         .pl10 > 1 & is.na(PL040A) ~ NA,
         .pl10 > 2 & PL150 == 1 ~ 7,
-        .pl10 > 2 & is.na(PL150) ~ NA
+        .pl10 > 2 & is.na(PL150) ~ NA,
+        .default = .pl10
       ),
       pl11a = dplyr::case_when(
         PL040A == 3 & PY030G != 0 ~ 1,
