@@ -1,3 +1,13 @@
+#' Construir variables adicionales en los conjuntos de datos P de la EU-SILC
+#'
+#' @param .datos Conjunto de datos P de la EU-SILC.
+#' @param ... ...
+#' @param .D Conjunto de datos D de la EU-SILC.
+#' @param .R Conjunto de datos R de la EU-SILC.
+#' @param .mantener Conservar las variables originales en el conjunto de datos final o eliminarlas.
+#'
+#' @returns Conjunto de datos de la EU-SILC con variables adicionales de uso habitual.
+#' @export
 expandir_personas <- function(
     .datos,
     ...,
@@ -29,7 +39,6 @@ expandir_personas <- function(
       dplyr::left_join(
         R, by = dplyr::join_by(PB010 == RB010, PB020 == RB020, PB030 == RB030)
       )
-
   }
 
   datos <- construir_variables_p(.datos, .pais, bloques)

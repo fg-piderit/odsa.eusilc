@@ -1,3 +1,13 @@
+#' Construir variables adicionales en los conjuntos de datos H de la EU-SILC
+#'
+#' @param .datos Conjunto de datos H de la EU-SILC.
+#' @param .P Conjunto de datos P de la EU-SILC expandido por `expandir_eusilc()`.
+#' @param ... ...
+#' @param .D Conjunto de datos D de la EU-SILC.
+#' @param .mantener Conservar las variables originales en el conjunto de datos final o eliminarlas.
+#'
+#' @returns Conjunto de datos de la EU-SILC con variables adicionales de uso habitual
+#' @export
 expandir_hogares <- function(
     .datos,
     .P,
