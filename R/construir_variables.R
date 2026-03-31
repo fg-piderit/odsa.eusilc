@@ -5,8 +5,7 @@ construir_variables_p <- function(
     .datos,
     .pais,
     .bloques,
-    ...,
-    .mantener = FALSE
+    ...
 ) {
   datos <- .datos |>
     dplyr::mutate(
@@ -112,10 +111,6 @@ construir_variables_p <- function(
       .keep = "all"
     )
 
-  if (.bloques["D"]) {
-    datos <- datos |>  dplyr::mutate(pi03 = DB040, .keep = "all")
-  }
-
   if (.bloques["R"]) {
     datos <- datos |>
       dplyr::mutate(
@@ -176,16 +171,15 @@ construir_variables_p <- function(
       )
   }
 
-  if (!.mantener) datos <- datos |> dplyr::select(-dplyr::all_of(names(.datos)))
 
   # ------------------------------------------
   return(datos)
 }
 
 # agregar_p ------------------------------------------------------------------
-agregar_p <- function(.individuos) {
-  if (attr(.individuos, "bloques")["LMH"]) {
-    individuos <- .individuos |>
+agregar_personas <- function(.personas) {
+  if (attr(.personas, "bloques")["LMH"]) {
+    personas <- .personas |>
       dplyr::summarise(
         # Bloque Y -----------------------
         across(c(py01:py03, py04:py13), sum, .names = "{.col}p"),
@@ -194,7 +188,7 @@ agregar_p <- function(.individuos) {
         .by = c(pi01, pi02, pi04)
       )
   } else {
-    individuos <- .individuos |>
+    personas <- .personas |>
       dplyr::summarise(
         # Bloque Y -----------------------
         dplyr::across(py04:py13, sum, .names = "{.col}p"),
@@ -204,21 +198,19 @@ agregar_p <- function(.individuos) {
       )
   }
 
-  individuos <- individuos |>
+  personas <- personas |>
     dplyr::rename_with(.cols = dplyr::starts_with("py"), .fn = \(n) sub("py", "hy", n)) |>
     dplyr::rename_with(.cols = dplyr::starts_with("xpy"), .fn = \(n) sub("xpy", "hp", n))
 
-  return(individuos)
+  return(personas)
 }
 
 # construir_variables_h ------------------------------------------------------
 construir_variables_h <- function(
     .datos,
     .pais,
-    .bloques,
     .ind,
-    ...,
-    .mantener = FALSE
+    ...
 ) {
   hogares <- .datos |>
     dplyr::mutate(
@@ -226,7 +218,6 @@ construir_variables_h <- function(
       hi01 = HB010,
       hi02 = HB020,
       hi04 = HB030,
-      hi06 = "Base D",
       # Bloque D -----------------------
       hd01 = HX040,
       thogara = "A definir",
@@ -252,24 +243,6 @@ construir_variables_h <- function(
       hyxxq = "hy01p a hy21 / PPA correspondiente",
       .keep = "all"
     )
-
-  if (.bloques["LMH"]) {
-    hogares <- hogares |>
-      dplyr::mutate(
-        dplyr::across(
-          .cols = c(hy01p:hy03p),
-          .fns = \(y) y / 12, .names = "{.col}m"
-        ),
-        dplyr::across(
-          .cols = c(hy01p:hy03p),
-          .fns = \(y) y / hd01, .names = "{.col}c"
-        ),
-        hyxxq = "hy01p a hy03p / PPA correspondiente",
-        .keep = "all"
-      )
-  }
-
-  if (!.mantener) hogares <- hogares |> dplyr::select(-dplyr::all_of(names(.datos)))
 
   # ------------------------------------------
   return(hogares)

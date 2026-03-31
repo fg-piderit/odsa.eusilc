@@ -12,22 +12,44 @@ expandir_hogares <- function(
     D = !is.null(.D), attr(.P, "bloques")["LMH"]
   )
 
-  if (bloques["D"]) {
-    D <- .D |>
-      select(DB010, DB020, DB030, DB040, DB090)
-    .datos <- .datos |>
-      dplyr::left_join(
-        D, by = dplyr::join_by(HB010 == DB010, HB020 == DB020, HB030 = DB030)
-      )
-  }
-
-  P <- agregar_p(.P)
+  P <- agregar_personas(.P)
   datos <- .datos |>
     dplyr::left_join(
       P, by = dplyr::join_by(HB010 == pi01, HB020 == pi02, HB030 == pi04)
     )
 
-  datos <- construir_variables_h(datos, .pais, bloques, P, .mantener = .mantener)
+  datos <- construir_variables_h(datos, .pais, P)
+
+  if (bloques["D"]) {
+    D <- .D |>
+      dplyr::select(DB010, DB020, DB030, DB040, DB090)
+    datos <- datos |>
+      dplyr::left_join(
+        D, by = dplyr::join_by(hi01 == DB010, hi02 == DB020, hi04 == DB030)
+      ) |>
+      dplyr::rename(hi06 = DB090)
+  }
+
+  if (bloques["LMH"]) {
+    datos <- datos |>
+      dplyr::mutate(
+        dplyr::across(
+          .cols = c(hy01p:hy03p),
+          .fns = \(y) y / 12, .names = "{.col}m"
+        ),
+        dplyr::across(
+          .cols = c(hy01p:hy03p),
+          .fns = \(y) y / hd01, .names = "{.col}c"
+        ),
+        hyxxq = "hy01p a hy03p / PPA correspondiente",
+        .keep = "all"
+      )
+  }
+
+  if (!.mantener) datos <- datos |> dplyr::select(-dplyr::all_of(names(.datos)))
+
+  attr(datos, "bloques") <- bloques
+  attr(datos, "base") <- "H"
 
   return(datos)
 }

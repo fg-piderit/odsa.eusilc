@@ -8,9 +8,8 @@ expandir_personas <- function(
   # Chequeos args ----------------------
 
   # Calcular vbles ---------------------
-  variables <- names(.datos)
   bloques <- c(
-    D = !is.null(.D), R = !is.null(.R), LMH = all(c("PL130", "PL230") %in% variables)
+    D = !is.null(.D), R = !is.null(.R), LMH = all(c("PL130", "PL230") %in% names(.datos))
   )
 
   if (bloques["D"]) {
@@ -19,7 +18,8 @@ expandir_personas <- function(
     .datos <- .datos |>
       dplyr::left_join(
         D, by = dplyr::join_by(PB010 == DB010, PB020 == DB020, PX030 == DB030)
-      )
+      ) |>
+      dplyr::rename(pi03 = DB040)
   }
 
   if (bloques["R"]) {
@@ -32,7 +32,9 @@ expandir_personas <- function(
 
   }
 
-  datos <- construir_variables_p(.datos, .pais, bloques, .mantener = .mantener)
+  datos <- construir_variables_p(.datos, .pais, bloques)
+
+  if (!.mantener) datos <- datos |> dplyr::select(-dplyr::all_of(names(.datos)))
 
   attr(datos, "bloques") <- bloques
   attr(datos, "base") <- "P"
