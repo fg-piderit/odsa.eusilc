@@ -1,10 +1,9 @@
 # Funciones para construir las variables de las bases finales
 #
-# construir variables_p ------------------------------------------------------
-construir_variables_p <- function(
+# construir_vbles_p ------------------------------------------------------
+construir_vbles_p <- function(
     .datos,
     .pais,
-    .bloques,
     ...
 ) {
   datos <- .datos |>
@@ -111,68 +110,59 @@ construir_variables_p <- function(
       .keep = "all"
     )
 
-  if (.bloques["R"]) {
-    datos <- datos |>
-      dplyr::mutate(
-        pd01a = RB082,
-        pd01b = RB081,
-        pd04 = dplyr::if_else(RB280 == pi02, 1, 2),
-        pd05 = dplyr::if_else(RB290 == pi02, 1, 2),
-        .keep = "all"
-      )
-  }
-
-  if (.bloques["LMH"]) {
-    datos <- datos |>
-      dplyr::mutate(
-        # Bloque L -----------------------
-        pl06a = dplyr::case_when(
-          PL130 <= 5 ~ 1,
-          PL130 > 5 & PL130 <= 9 ~ 2,
-          PL130 > 9 & PL130 <= 11 ~ 3,
-          PL130 > 11 & PL130 <= 13 ~ 4,
-          .default = NA
-        ),
-        pl06b = dplyr::case_when(
-          PL130 <= 5 ~ 1,
-          PL130 > 5 & PL130 <= 11 ~ 2,
-          PL130 > 11 & PL130 <= 13 ~ 3,
-          .default = NA
-        ),
-        pl07 = dplyr::case_when(
-          PL230 == 1 ~ 1,
-          PL230 == 2 ~ 2,
-          .default = NA
-        ),
-        pl09a = dplyr::case_when(
-          PL040A == 1 & pl07 == 2 & pl06b > 1 ~ 1,
-          PL040A == 2 & pl07 == 2 & pl08b == 1 ~ 2,
-          pl02 == 1 & pl07 == 1 ~ 3,
-          PL040A == 3 & pl07 == 2 & pl06b == 3 ~ 4,
-          PL040A == 3 & pl07 == 2 & pl06b == 2 ~ 5,
-          PL040A == 1 & pl07 == 2 & pl06b == 1 ~ 6,
-          PL040A == 2 & pl07 == 2 & pl08b == 2 ~ 7,
-          PL040A == 3 & pl07 == 2 & pl06b == 1 ~ 8,
-          pl02 == 1 & pl05 == 8 ~ 9,
-          .default = NA
-        ),
-        pl09b = dplyr::case_when(
-          pl09a == 3 ~ 1,
-          pl09a %in% c(1, 2, 4, 5, 9) ~ 2,
-          pl09a %in% c(7, 8) ~ 3,
-          .default = NA
-        ),
-        # Bloque Y -----------------------
-        py01 = dplyr::if_else(py11 != 0 & pl09b == 1, py11, 0),
-        py02 = dplyr::if_else(py11 != 0 & pl09b == 2, py11, 0),
-        py03 = dplyr::if_else(py11 != 0 & pl09b == 3, py11, 0),
-        across(py01:py03, \(y) y / .haa, .names = "{.col}h"),
-        .keep = "all"
-      )
-  }
-
-
   # ------------------------------------------
+  return(datos)
+}
+
+# construir_vbles_p_lmh ------------------------------------------------------
+construir_vbles_p_lmh <- function(.datos, .pais) {
+  datos <- .datos |>
+    dplyr::mutate(
+      # Bloque L -----------------------
+      pl06a = dplyr::case_when(
+        PL130 <= 5 ~ 1,
+        PL130 > 5 & PL130 <= 9 ~ 2,
+        PL130 > 9 & PL130 <= 11 ~ 3,
+        PL130 > 11 & PL130 <= 13 ~ 4,
+        .default = NA
+      ),
+      pl06b = dplyr::case_when(
+        PL130 <= 5 ~ 1,
+        PL130 > 5 & PL130 <= 11 ~ 2,
+        PL130 > 11 & PL130 <= 13 ~ 3,
+        .default = NA
+      ),
+      pl07 = dplyr::case_when(
+        PL230 == 1 ~ 1,
+        PL230 == 2 ~ 2,
+        .default = NA
+      ),
+      pl09a = dplyr::case_when(
+        PL040A == 1 & pl07 == 2 & pl06b > 1 ~ 1,
+        PL040A == 2 & pl07 == 2 & pl08b == 1 ~ 2,
+        pl02 == 1 & pl07 == 1 ~ 3,
+        PL040A == 3 & pl07 == 2 & pl06b == 3 ~ 4,
+        PL040A == 3 & pl07 == 2 & pl06b == 2 ~ 5,
+        PL040A == 1 & pl07 == 2 & pl06b == 1 ~ 6,
+        PL040A == 2 & pl07 == 2 & pl08b == 2 ~ 7,
+        PL040A == 3 & pl07 == 2 & pl06b == 1 ~ 8,
+        pl02 == 1 & pl05 == 8 ~ 9,
+        .default = NA
+      ),
+      pl09b = dplyr::case_when(
+        pl09a == 3 ~ 1,
+        pl09a %in% c(1, 2, 4, 5, 9) ~ 2,
+        pl09a %in% c(7, 8) ~ 3,
+        .default = NA
+      ),
+      # Bloque Y -----------------------
+      py01 = dplyr::if_else(py11 != 0 & pl09b == 1, py11, 0),
+      py02 = dplyr::if_else(py11 != 0 & pl09b == 2, py11, 0),
+      py03 = dplyr::if_else(py11 != 0 & pl09b == 3, py11, 0),
+      across(py01:py03, \(y) y / .haa, .names = "{.col}h"),
+      .keep = "all"
+    )
+
   return(datos)
 }
 
@@ -205,8 +195,8 @@ agregar_personas <- function(.personas) {
   return(personas)
 }
 
-# construir_variables_h ------------------------------------------------------
-construir_variables_h <- function(
+# construir_vbles_h ------------------------------------------------------
+construir_vbles_h <- function(
     .datos,
     .pais,
     .ind,

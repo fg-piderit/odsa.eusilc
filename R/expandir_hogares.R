@@ -28,14 +28,14 @@ expandir_hogares <- function(
       P, by = dplyr::join_by(HB010 == pi01, HB020 == pi02, HB030 == pi04)
     )
 
-  datos <- construir_variables_h(datos, .pais, P)
+  datos <- construir_vbles_h(datos, .pais, P)
 
   if (bloques["D"]) {
     D <- .D |>
       dplyr::select(DB010, DB020, DB030, DB040, DB090)
     datos <- datos |>
       dplyr::left_join(
-        D, by = dplyr::join_by(hi01 == DB010, hi02 == DB020, hi04 == DB030)
+        D, by = dplyr::join_by(HB010 == DB010, HB020 == DB020, HB030 == DB030)
       ) |>
       dplyr::rename(hi06 = DB090)
   }
