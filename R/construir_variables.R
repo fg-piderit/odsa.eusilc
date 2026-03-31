@@ -88,8 +88,19 @@ construir_vbles_p <- function(
         .pl10 > 2 & PL150 == 1 ~ 7,
         .pl10 > 2 & is.na(PL150) ~ NA
       ),
-      pl11a = "a definir",
-      pl11b = "a definir",
+      pl11a = dplyr::case_when(
+        PL040A == 3 & PY030G != 0 ~ 1,
+        PL040A == 3 & PY030G == 0 ~ 2,
+        PL040A %in% 1:2 & !(PY030G == 0 & PY035G == 0) ~ 3,
+        PL040A %in% 1:2 & PY030G == 0 & PY035G == 0 ~ 4,
+        PL040A == 4 ~ 4,
+        .default = NA
+      ),
+      pl11b = dplyr::case_when(
+        pl11a %in% c(1, 3) ~ 1,
+        pl11a %in% c(2, 4) ~ 2,
+        .default = NA
+      ),
       # Bloque Y -----------------------
       py04 = PY010N,
       py05 = PY050N,
@@ -210,8 +221,8 @@ construir_vbles_h <- function(
       hi04 = HB030,
       # Bloque D -----------------------
       hd01 = HX040,
-      thogara = "A definir",
-      thogarb = "A definir",
+      hd02a = "A definir",
+      hd02b = "A definir",
       # Bloque L -----------------------
       # Bloque Y -----------------------
       hy14 = HY040N + HY090N,
