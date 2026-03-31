@@ -80,7 +80,6 @@ construir_vbles_p <- function(
         .default = NA
       ),
       pl10 = dplyr::case_when(
-        x = .pl10,
         .pl10 == 8 & PL040A != 1 ~ 8,
         .pl10 > 1 & PL040A == 1 ~ 2,
         .pl10 > 1 & PL040A == 2 ~ 6,
