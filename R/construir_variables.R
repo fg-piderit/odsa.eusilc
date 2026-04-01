@@ -222,7 +222,7 @@ agregar_personas <- function(.personas) {
 #' Construye variables en la base H de la EU-SILC.
 #'
 #' @param .datos Conjunto H de la EU-SILC.
-#' @param ...
+#' @param ... ...
 #'
 #' @returns Conjunto H de la EU-SILC con variables adicionales.
 construir_vbles_h <- function(

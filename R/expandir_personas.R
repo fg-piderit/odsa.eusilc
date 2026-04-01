@@ -16,6 +16,18 @@ expandir_personas <- function(
     .mantener = FALSE
 ) {
   # Chequeos args ----------------------
+  if (!is.data.frame(.datos)) {
+    rlang::abort("`.datos` debe ser un data.frame o tibble.")
+  }
+  if (!is.null(.D) & !is.data.frame(.D)) {
+    rlang::abort("`.D` debe ser un data.frame o tibble.")
+  }
+  if (!is.null(.R) & !is.data.frame(.D)) {
+    rlang::abort("`.R` debe ser un data.frame o tibble.")
+  }
+  if (!is.logical(.mantener)) {
+    rlang::abort("`.mantener` debe ser `TRUE` o `FALSE`.")
+  }
 
   # Calcular vbles ---------------------
   bloques <- c(
@@ -24,7 +36,7 @@ expandir_personas <- function(
     LMH = all(c("PL130", "PL230") %in% names(.datos))
   )
 
-  datos <- construir_vbles_p(.datos, .pais)
+  datos <- construir_vbles_p(.datos)
 
   if (bloques["D"]) {
     D <- .D |>
@@ -34,6 +46,8 @@ expandir_personas <- function(
         D, by = dplyr::join_by(PB010 == DB010, PB020 == DB020, PX030 == DB030)
       ) |>
       dplyr::rename(pi03 = DB040)
+  } else {
+    rlang::warn("No se proporciono el conjunto D. Se omiten: `pi03`.")
   }
 
   if (bloques["R"]) {
@@ -51,16 +65,29 @@ expandir_personas <- function(
         pd05 = dplyr::if_else(RB290 == pi02, 1, 2),
         .keep = "all"
       )
+  } else {
+    rlang::warn("No se proporciono el conjunto R. Se omiten: `pd01a`, `pd01b`, `pd04`, `pd05`.")
   }
 
   if (bloques["LMH"]) {
-    datos <- construir_vbles_p_lmh(datos, .pais)
+    datos <- construir_vbles_p_lmh(datos)
+  } else {
+    rlang::warn("No se encontro `PL130` o `PL230`. Se omiten: `pl06a`, `pl06b`, `pl07`, `pl09a`, `pl09b`, `py01`, `py02`, `py03`.")
   }
 
+  # Arreglos y devolver ----------------
   if (!.mantener) {
-    datos <- datos |>
-      dplyr::select(-dplyr::any_of(c(names(.datos), names(.R))))
+    datos <- datos |> dplyr::select(-dplyr::any_of(c(names(.datos), names(.R))))
   }
+
+  datos <- datos |>
+    dplyr::relocate(
+      dplyr::starts_with("pi"),
+      dplyr::starts_with("pd"),
+      dplyr::starts_with("pl"),
+      dplyr::starts_with("py"),
+      dplyr::everything()
+    )
 
   attr(datos, "bloques") <- bloques
   attr(datos, "base") <- "P"

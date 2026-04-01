@@ -9,7 +9,7 @@ construir_vbles_h(.datos, ...)
 \arguments{
 \item{.datos}{Conjunto H de la EU-SILC.}
 
-\item{...}{}
+\item{...}{...}
 }
 \value{
 Conjunto H de la EU-SILC con variables adicionales.
