@@ -1,9 +1,11 @@
-# Funciones para construir las variables de las bases finales
-#
-# construir_vbles_p ------------------------------------------------------
+#' Construye variables en la base P de la EU-SILC.
+#'
+#' @param .datos Conjunto P de la EU-SILC.
+#' @param ... ...
+#'
+#' @returns Conjunto de datos P de la EU-SILC con variables adicionales.
 construir_vbles_p <- function(
     .datos,
-    .pais,
     ...
 ) {
   datos <- .datos |>
@@ -125,8 +127,13 @@ construir_vbles_p <- function(
   return(datos)
 }
 
-# construir_vbles_p_lmh ------------------------------------------------------
-construir_vbles_p_lmh <- function(.datos, .pais) {
+#' Construye variables dependientes del módulo Labour Market and Housing de
+#' la base P de la EU-SILC
+#'
+#' @param .datos Conjunto P de la EU-SILC expandido con [construir_vbles_p()].
+#'
+#' @returns Conjunto P de la EU-SILC con variables adicionales.
+construir_vbles_p_lmh <- function(.datos) {
   datos <- .datos |>
     dplyr::mutate(
       # Bloque L -----------------------
@@ -174,10 +181,15 @@ construir_vbles_p_lmh <- function(.datos, .pais) {
       .keep = "all"
     )
 
+  # ------------------------------------------
   return(datos)
 }
 
-# agregar_p ------------------------------------------------------------------
+#' Agrega variables de ingreso de la base P de la EU-SILC a nivel hogar.
+#'
+#' @param .personas Conjunto P de la EU-SILC expandido con [construir_vbles_p()] y, opcionalmente, con [construir_vbles_p_lmh()].
+#'
+#' @returns Conjunto de datos con ingresos individuales agregados a nivel hogar.
 agregar_personas <- function(.personas) {
   if (attr(.personas, "bloques")["LMH"]) {
     personas <- .personas |>
@@ -203,14 +215,18 @@ agregar_personas <- function(.personas) {
     dplyr::rename_with(.cols = dplyr::starts_with("py"), .fn = \(n) sub("py", "hy", n)) |>
     dplyr::rename_with(.cols = dplyr::starts_with("xpy"), .fn = \(n) sub("xpy", "hp", n))
 
+  # ------------------------------------------
   return(personas)
 }
 
-# construir_vbles_h ------------------------------------------------------
+#' Construye variables en la base H de la EU-SILC.
+#'
+#' @param .datos Conjunto H de la EU-SILC.
+#' @param ...
+#'
+#' @returns Conjunto H de la EU-SILC con variables adicionales.
 construir_vbles_h <- function(
     .datos,
-    .pais,
-    .ind,
     ...
 ) {
   hogares <- .datos |>
