@@ -22,7 +22,7 @@ expandir_personas <- function(
   if (!is.null(.D) & !is.data.frame(.D)) {
     rlang::abort("`.D` debe ser un data.frame o tibble.")
   }
-  if (!is.null(.R) & !is.data.frame(.D)) {
+  if (!is.null(.R) & !is.data.frame(.R)) {
     rlang::abort("`.R` debe ser un data.frame o tibble.")
   }
   if (!is.logical(.mantener)) {
