@@ -60,10 +60,10 @@ construir_vbles_p <- function(
         .default = NA
       ),
       pl08a = dplyr::case_when(
-        PL051A %in% 11:13 | PL051A %/% 10 == 2 ~ 1,
+        PL051A %in% 11:13 | PL051A %/% 10 == 2 | PL051A == 1 ~ 1,
         PL051A == 14 | PL051A %/% 10 == 3 ~ 2,
-        PL051A %/% 10 %in% 4:8 ~ 3,
-        PL051A %/% 10 == 9 ~ 4,
+        PL051A %/% 10 %in% 4:8 | PL051A == 2 ~ 3,
+        PL051A %/% 10 == 9 | PL051A == 3 ~ 4,
         .default = NA
       ),
       pl08b = dplyr::case_when(
@@ -256,7 +256,7 @@ construir_vbles_h <- function(
       ),
       dplyr::across(
         .cols = c(py04:py13, hy14:hy17, hy18:hy21),
-        .fns = \(y) y / hd01, .names = "{.col}c"
+        .fns = \(y) y / hd01, .names = "{.col}pc"
       ),
       hyxxq = "py01 a hy21 / PPA correspondiente",
       .keep = "all"

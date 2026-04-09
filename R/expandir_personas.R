@@ -52,7 +52,7 @@ expandir_personas <- function(
 
   if (bloques["R"]) {
     R <- .R |>
-      dplyr::select(RB010, RB020, RB030, RB081, RB082, RB280, RB290)
+      dplyr::select(RB010, RB020, RB030, RB080, RB081, RB082, RB280, RB290)
     datos <- datos |>
       dplyr::left_join(
         R, by = dplyr::join_by(PB010 == RB010, PB020 == RB020, PB030 == RB030)
@@ -61,6 +61,7 @@ expandir_personas <- function(
       dplyr::mutate(
         pd01a = RB082,
         pd01b = RB081,
+        pd01c = round((RB010 - RB080 - 1) * 1/5) * 5 + 1,
         pd04 = dplyr::if_else(RB280 == pi02, 1, 2),
         pd05 = dplyr::if_else(RB290 == pi02, 1, 2),
         .keep = "all"
