@@ -59,14 +59,14 @@ expandir_hogares <- function(
     datos <- datos |>
       dplyr::mutate(
         dplyr::across(
-          .cols = c(hy01p:hy03p),
+          .cols = c(py01:py03),
           .fns = \(y) y / 12, .names = "{.col}m"
         ),
         dplyr::across(
-          .cols = c(hy01p:hy03p),
+          .cols = c(py01:py03),
           .fns = \(y) y / hd01, .names = "{.col}c"
         ),
-        hyxxq = "hy01p a hy03p / PPA correspondiente",
+        hyxxq = "py01 a py03 / PPA correspondiente",
         .keep = "all"
       )
   } else {
@@ -80,11 +80,7 @@ expandir_hogares <- function(
 
   datos <- datos |>
     dplyr::relocate(
-      dplyr::starts_with("hi"),
-      dplyr::starts_with("hd"),
-      dplyr::starts_with("hl"),
-      dplyr::starts_with("hy"),
-      dplyr::starts_with("hp"),
+      dplyr::starts_with(c("hi", "hd", "hl", "py", "hy", "hp")),
       dplyr::everything()
     )
 

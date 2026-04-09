@@ -82,10 +82,7 @@ expandir_personas <- function(
 
   datos <- datos |>
     dplyr::relocate(
-      dplyr::starts_with("pi"),
-      dplyr::starts_with("pd"),
-      dplyr::starts_with("pl"),
-      dplyr::starts_with("py"),
+      dplyr::starts_with(c("pi", "pd", "pl", "py")),
       dplyr::everything()
     )
 

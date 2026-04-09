@@ -197,7 +197,7 @@ agregar_personas <- function(.personas) {
     personas <- .personas |>
       dplyr::summarise(
         # Bloque Y -----------------------
-        dplyr::across(c(py01:py03, py04:py13), sum, .names = "{.col}p"),
+        dplyr::across(c(py01:py03, py04:py13), sum),
         # Bloque P -----------------------
         dplyr::across(c(py01:py03, py04:py13), \(y) sum(y != 0), .names = "x{.col}"),
         .by = c(pi01, pi02, pi04)
@@ -206,7 +206,7 @@ agregar_personas <- function(.personas) {
     personas <- .personas |>
       dplyr::summarise(
         # Bloque Y -----------------------
-        dplyr::across(py04:py13, sum, .names = "{.col}p"),
+        dplyr::across(py04:py13, sum),
         # Bloque P -----------------------
         dplyr::across(py04:py13, \(y) sum(y != 0), .names = "x{.col}"),
         .by = c(pi01, pi02, pi04)
@@ -214,7 +214,6 @@ agregar_personas <- function(.personas) {
   }
 
   personas <- personas |>
-    dplyr::rename_with(.cols = dplyr::starts_with("py"), .fn = \(n) sub("py", "hy", n)) |>
     dplyr::rename_with(.cols = dplyr::starts_with("xpy"), .fn = \(n) sub("xpy", "hp", n))
 
   # ------------------------------------------
@@ -247,19 +246,19 @@ construir_vbles_h <- function(
       hy15 = HY050N + HY060N + HY070N,
       hy16 = HY080N + HY110N,
       hy17 = hy14 + hy16,
-      hy18 = hy08p + hy09p + hy15,
-      hy19 = hy10p + hy18,
-      hy20 = hy12p + hy14 + hy15 + hy16,
-      hy21 = hy13p + hy14 + hy15 + hy16,
+      hy18 = py08 + py09 + hy15,
+      hy19 = py10 + hy18,
+      hy20 = py12 + hy14 + hy15 + hy16,
+      hy21 = py13 + hy14 + hy15 + hy16,
       dplyr::across(
-        .cols = c(hy04p:hy13p, hy14:hy21),
+        .cols = c(py04:py13, hy14:hy21),
         .fns = \(y) y / 12, .names = "{.col}m"
       ),
       dplyr::across(
-        .cols = c(hy04p:hy13p, hy14:hy17, hy18:hy21),
+        .cols = c(py04:py13, hy14:hy17, hy18:hy21),
         .fns = \(y) y / hd01, .names = "{.col}c"
       ),
-      hyxxq = "hy01p a hy21 / PPA correspondiente",
+      hyxxq = "py01 a hy21 / PPA correspondiente",
       .keep = "all"
     )
 
