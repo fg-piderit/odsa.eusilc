@@ -153,17 +153,19 @@ construir_vbles_p_lmh <- function(.datos) {
       pl07 = dplyr::case_when(
         PL230 == 1 ~ 1,
         PL230 == 2 ~ 2,
+        PL230 == 3 ~ 3,
         .default = NA
       ),
       pl09a = dplyr::case_when(
-        PL040A == 1 & pl07 == 2 & pl06b > 1 ~ 1,
-        PL040A == 2 & pl07 == 2 & pl08b == 1 ~ 2,
+        PL040A == 1 & pl06b > 1 ~ 1,
+        PL040A == 2 & pl08b == 1 ~ 2,
         pl02 == 1 & pl07 == 1 ~ 3,
         PL040A == 3 & pl07 == 2 & pl06b == 3 ~ 4,
         PL040A == 3 & pl07 == 2 & pl06b == 2 ~ 5,
-        PL040A == 1 & pl07 == 2 & pl06b == 1 ~ 6,
-        PL040A == 2 & pl07 == 2 & pl08b == 2 ~ 7,
+        PL040A == 1 & pl06b == 1 ~ 6,
+        PL040A == 2 & pl08b == 2 ~ 7,
         PL040A == 3 & pl07 == 2 & pl06b == 1 ~ 8,
+        PL040A == 4 ~ 8,
         pl02 == 1 & pl05 == 8 ~ 9,
         .default = NA
       ),
