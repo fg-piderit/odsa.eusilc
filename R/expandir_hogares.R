@@ -23,10 +23,10 @@ expandir_hogares <- function(
     rlang::abort("`.P` debe ser un data.frame o tibble.")
   }
   if (is.null(attr(.P, "base"))) {
-    rlang::abort("`.individuos` debe ser una base P expandida con `expandir_eusilc().`")
+    rlang::abort("`.P` debe ser una base P expandida con `expandir_eusilc().`")
   }
   if (attr(.P, "base") != "P") {
-    rlang::abort("`.individuos` debe ser una base P expandida con `expandir_eusilc().`")
+    rlang::abort("`.P` debe ser una base P expandida con `expandir_eusilc().`")
   }
   if (!is.null(.D) & !is.data.frame(.D)) {
     rlang::abort("`.D` debe ser un data.frame o tibble.")
@@ -74,7 +74,9 @@ expandir_hogares <- function(
   }
 
   # Arreglos y devolver ----------------
-  if (!.mantener) datos <- datos |> dplyr::select(-dplyr::all_of(names(.datos)))
+  if (!.mantener) {
+    datos <- datos |> dplyr::select(-dplyr::all_of(c(names(.datos), names(.D))))
+  }
 
   datos <- datos |>
     dplyr::relocate(

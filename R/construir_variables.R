@@ -177,7 +177,7 @@ construir_vbles_p_lmh <- function(.datos) {
       py01 = dplyr::if_else(py11 != 0 & pl09b == 1, py11, 0),
       py02 = dplyr::if_else(py11 != 0 & pl09b == 2, py11, 0),
       py03 = dplyr::if_else(py11 != 0 & pl09b == 3, py11, 0),
-      across(py01:py03, \(y) y / .haa, .names = "{.col}h"),
+      dplyr::across(py01:py03, \(y) y / .haa, .names = "{.col}h"),
       .keep = "all"
     )
 
@@ -195,9 +195,9 @@ agregar_personas <- function(.personas) {
     personas <- .personas |>
       dplyr::summarise(
         # Bloque Y -----------------------
-        across(c(py01:py03, py04:py13), sum, .names = "{.col}p"),
+        dplyr::across(c(py01:py03, py04:py13), sum, .names = "{.col}p"),
         # Bloque P -----------------------
-        across(c(py01:py03, py04:py13), \(y) sum(y != 0), .names = "x{.col}"),
+        dplyr::across(c(py01:py03, py04:py13), \(y) sum(y != 0), .names = "x{.col}"),
         .by = c(pi01, pi02, pi04)
       )
   } else {
