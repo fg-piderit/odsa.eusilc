@@ -39,33 +39,31 @@ expandir_personas <- function(
   datos <- construir_vbles_p(.datos)
 
   if (bloques["D"]) {
-    D <- .D |>
-      dplyr::select(DB010, DB020, DB030, DB040)
-    datos <- datos |>
-      dplyr::left_join(
-        D, by = dplyr::join_by(PB010 == DB010, PB020 == DB020, PX030 == DB030)
-      ) |>
-      dplyr::rename(pi03 = DB040)
+    D <- dplyr::select(.D, DB010, DB020, DB030, DB040)
+    datos <- dplyr::left_join(
+      datos, D,
+      by = dplyr::join_by(PB010 == DB010, PB020 == DB020, PX030 == DB030)
+    )
+    datos <- dplyr::rename(datos, pi03 = DB040)
   } else {
     rlang::warn("No se proporciono el conjunto D. Se omiten: `pi03`.")
   }
 
   if (bloques["R"]) {
-    R <- .R |>
-      dplyr::select(RB010, RB020, RB030, RB080, RB081, RB082, RB280, RB290)
-    datos <- datos |>
-      dplyr::left_join(
-        R, by = dplyr::join_by(PB010 == RB010, PB020 == RB020, PB030 == RB030)
-      )
-    datos <- datos |>
-      dplyr::mutate(
-        pd01a = RB082,
-        pd01b = RB081,
-        pd01c = round((RB010 - RB080 - 1) * 1/5) * 5 + 1,
-        pd04 = dplyr::if_else(RB280 == pi02, 1, 2),
-        pd05 = dplyr::if_else(RB290 == pi02, 1, 2),
-        .keep = "all"
-      )
+    R <- dplyr::select(.R, RB010, RB020, RB030, RB080, RB081, RB082, RB280, RB290)
+    datos <- dplyr::left_join(
+      datos, R,
+      by = dplyr::join_by(PB010 == RB010, PB020 == RB020, PB030 == RB030)
+    )
+    datos <- dplyr::mutate(
+      datos,
+      pd01a = RB082,
+      pd01b = RB081,
+      pd01c = PB010 - agrupar_nac(PB010, RB080),
+      pd04 = dplyr::if_else(RB280 == pi02, 1, 2),
+      pd05 = dplyr::if_else(RB290 == pi02, 1, 2),
+      .keep = "all"
+    )
   } else {
     rlang::warn("No se proporciono el conjunto R. Se omiten: `pd01a`, `pd01b`, `pd04`, `pd05`.")
   }
@@ -78,14 +76,14 @@ expandir_personas <- function(
 
   # Arreglos y devolver ----------------
   if (!.mantener) {
-    datos <- datos |> dplyr::select(-dplyr::any_of(c(names(.datos), names(.R))))
+    datos <- dplyr::select(datos, -dplyr::any_of(c(names(.datos), names(.R))))
   }
 
-  datos <- datos |>
-    dplyr::relocate(
-      dplyr::starts_with(c("pi", "pd", "pl", "py")),
-      dplyr::everything()
-    )
+  datos <- dplyr::relocate(
+    datos,
+    dplyr::starts_with(c("pi", "pd", "pl", "py"), ignore.case = FALSE),
+    dplyr::everything()
+  )
 
   attr(datos, "bloques") <- bloques
   attr(datos, "base") <- "P"

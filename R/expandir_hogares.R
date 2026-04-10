@@ -36,21 +36,19 @@ expandir_hogares <- function(
   bloques <- c(D = !is.null(.D), attr(.P, "bloques")["LMH"])
 
   P <- agregar_personas(.P)
-  datos <- .datos |>
-    dplyr::left_join(
-      P, by = dplyr::join_by(HB010 == pi01, HB020 == pi02, HB030 == pi04)
-    )
+  datos <- dplyr::left_join(
+    .datos, P,
+    by = dplyr::join_by(HB010 == pi01, HB020 == pi02, HB030 == pi04)
+  )
 
   datos <- construir_vbles_h(datos, P)
 
   if (bloques["D"]) {
-    D <- .D |>
-      dplyr::select(DB010, DB020, DB030, DB040, DB090)
-    datos <- datos |>
-      dplyr::left_join(
-        D, by = dplyr::join_by(HB010 == DB010, HB020 == DB020, HB030 == DB030)
-      ) |>
-      dplyr::rename(hi06 = DB090)
+    D <- dplyr::select(.D, DB010, DB020, DB030, DB040, DB090)
+    datos <- dplyr::left_join(
+      datos, D, by = dplyr::join_by(HB010 == DB010, HB020 == DB020, HB030 == DB030)
+    )
+    datos <- dplyr::rename(datos, hi06 = DB090)
   } else {
     rlang::warn("No se proporciono el conjunto D. Se omiten: `hi06`.")
   }
@@ -70,19 +68,19 @@ expandir_hogares <- function(
         .keep = "all"
       )
   } else {
-    rlang::warn("No se encontro `PL130` o `PL230` en `.P`. Se omiten: `hy01p`, `hy02p`, `hy03p`.")
+    rlang::warn("No se encontro `PL130` o `PL230` en `.P`. Se omiten: `py01`, `py02`, `py03`.")
   }
 
   # Arreglos y devolver ----------------
   if (!.mantener) {
-    datos <- datos |> dplyr::select(-dplyr::all_of(c(names(.datos), names(.D))))
+    datos <- dplyr::select(datos, -dplyr::any_of(c(names(.datos), names(.D))))
   }
 
-  datos <- datos |>
-    dplyr::relocate(
-      dplyr::starts_with(c("hi", "hd", "hl", "py", "hy", "hp")),
-      dplyr::everything()
-    )
+  datos <- dplyr::relocate(
+    datos,
+    dplyr::starts_with(c("hi", "hd", "hl", "py", "hy", "hp"), ignore.case = FALSE),
+    dplyr::everything()
+  )
 
   attr(datos, "bloques") <- bloques
   attr(datos, "base") <- "H"
