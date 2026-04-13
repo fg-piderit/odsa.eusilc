@@ -14,6 +14,6 @@
 agrupar_nac <- function(.anio, .nac) {
   desf <- (.anio - 1) %% 5
   nac_agrup <- .nac + (desf - .nac) %% 5
-  nac_agrup <- if_else(nac_agrup < .anio, nac_agrup, .anio)
+  nac_agrup <- dplyr::if_else(nac_agrup < .anio, nac_agrup, .anio)
   return(nac_agrup)
 }

@@ -4,7 +4,7 @@
 #' @param ... ...
 #' @param .D Conjunto de datos D de la EU-SILC.
 #' @param .R Conjunto de datos R de la EU-SILC.
-#' @param .mantener Conservar las variables originales en el conjunto de datos final o eliminarlas.
+#' @param .expandir Conservar las variables originales en el conjunto de datos final o eliminarlas.
 #'
 #' @returns Conjunto de datos de la EU-SILC con variables adicionales de uso habitual.
 #' @export
@@ -13,9 +13,9 @@ expandir_personas <- function(
     ...,
     .D = NULL,
     .R = NULL,
-    .mantener = FALSE
+    .expandir = FALSE
 ) {
-  # Chequeos args ----------------------
+  # Chequeos args ------------------------------------------------------------
   if (!is.data.frame(.datos)) {
     rlang::abort("`.datos` debe ser un data.frame o tibble.")
   }
@@ -25,16 +25,33 @@ expandir_personas <- function(
   if (!is.null(.R) & !is.data.frame(.R)) {
     rlang::abort("`.R` debe ser un data.frame o tibble.")
   }
-  if (!is.logical(.mantener)) {
-    rlang::abort("`.mantener` debe ser `TRUE` o `FALSE`.")
+  if (!is.logical(.expandir)) {
+    rlang::abort("`.expandir` debe ser `TRUE` o `FALSE`.")
   }
 
-  # Calcular vbles ---------------------
+  # Chequeos args ------------------------------------------------------------
+  anio <- unique(.datos$PB010)
   bloques <- c(
     D = !is.null(.D),
     R = !is.null(.R),
     LMH = all(c("PL130", "PL230") %in% names(.datos))
   )
+
+  if (anio <= 2021) {
+    .datos <- dplyr::mutate(
+      .datos,
+      PE041 = PE040,
+      PL032 = dplyr::case_when(
+        PL031 %in% 1:4 ~ 1,
+        PL031 %in% 5 ~ 2,
+        PL031 %in% 6:11 ~ 3,
+        .default = NA
+      ),
+      PL040A = PL040,
+      PL051A = PL051,
+      PL111A = PL111
+    )
+  }
 
   datos <- construir_vbles_p(.datos)
 
@@ -50,20 +67,32 @@ expandir_personas <- function(
   }
 
   if (bloques["R"]) {
-    R <- dplyr::select(.R, RB010, RB020, RB030, RB080, RB081, RB082, RB280, RB290)
+    R <- dplyr::select(.R, dplyr::any_of(c("RB010", "RB020", "RB030", "RB080",
+                                           "RB081", "RB082", "RB280", "RB290")))
     datos <- dplyr::left_join(
       datos, R,
       by = dplyr::join_by(PB010 == RB010, PB020 == RB020, PB030 == RB030)
     )
-    datos <- dplyr::mutate(
-      datos,
-      pd01a = RB082,
-      pd01b = RB081,
-      pd01c = PB010 - agrupar_nac(PB010, RB080),
-      pd04 = dplyr::if_else(RB280 == pi02, 1, 2),
-      pd05 = dplyr::if_else(RB290 == pi02, 1, 2),
-      .keep = "all"
-    )
+
+    if (anio <= 2021) {
+      datos <- dplyr::mutate(
+        datos,
+        pd01b = PB010 - RB080 - 1,
+        pd01c = PB010 - agrupar_nac(PB010, RB080) - 1,
+        .keep = "all"
+      )
+      rlang::warn("La base es anterior a 2021. Se omiten: `pd01a`, `pd04` y `pd05`.")
+    } else {
+      datos <- dplyr::mutate(
+        datos,
+        pd01a = RB082,
+        pd01b = dplyr::if_else(!is.na(RB081), RB081, PB010 - RB080 - 1),
+        pd01c = PB010 - agrupar_nac(PB010, RB080) - 1,
+        pd04 = dplyr::if_else(RB280 == pi02, 1, 2),
+        pd05 = dplyr::if_else(RB290 == pi02, 1, 2),
+        .keep = "all"
+      )
+    }
   } else {
     rlang::warn("No se proporciono el conjunto R. Se omiten: `pd01a`, `pd01b`, `pd04`, `pd05`.")
   }
@@ -74,8 +103,8 @@ expandir_personas <- function(
     rlang::warn("No se encontro `PL130` o `PL230`. Se omiten: `pl06a`, `pl06b`, `pl07`, `pl09a`, `pl09b`, `py01`, `py02`, `py03`.")
   }
 
-  # Arreglos y devolver ----------------
-  if (!.mantener) {
+  # Arreglos y devolver ------------------------------------------------------
+  if (!.expandir) {
     datos <- dplyr::select(datos, -dplyr::any_of(c(names(.datos), names(.R))))
   }
 

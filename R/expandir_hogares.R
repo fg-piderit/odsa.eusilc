@@ -4,7 +4,7 @@
 #' @param .P Conjunto de datos P de la EU-SILC expandido por `expandir_eusilc()`.
 #' @param ... ...
 #' @param .D Conjunto de datos D de la EU-SILC.
-#' @param .mantener Conservar las variables originales en el conjunto de datos final o eliminarlas.
+#' @param .expandir Conservar las variables originales en el conjunto de datos final o eliminarlas.
 #'
 #' @returns Conjunto de datos de la EU-SILC con variables adicionales de uso habitual
 #' @export
@@ -13,7 +13,7 @@ expandir_hogares <- function(
     .P,
     ...,
     .D = NULL,
-    .mantener = FALSE
+    .expandir = FALSE
 ) {
   # Chequeos args ----------------------
   if (!is.data.frame(.datos)) {
@@ -72,7 +72,7 @@ expandir_hogares <- function(
   }
 
   # Arreglos y devolver ----------------
-  if (!.mantener) {
+  if (!.expandir) {
     datos <- dplyr::select(datos, -dplyr::any_of(c(names(.datos), names(.D))))
   }
 
