@@ -85,8 +85,9 @@ expandir_hogares <- function(
     )
   }
 
-  attr(datos, "bloques") <- bloques
   attr(datos, "base") <- "H"
+  attr(datos, "bloques") <- bloques
+  attr(datos, "expandida") <- .expandir
 
   return(datos)
 }

@@ -116,8 +116,9 @@ expandir_personas <- function(
     )
   }
 
-  attr(datos, "bloques") <- bloques
   attr(datos, "base") <- "P"
+  attr(datos, "bloques") <- bloques
+  attr(datos, "expandida") <- .expandir
 
   return(datos)
 }
