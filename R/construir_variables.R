@@ -19,6 +19,7 @@ construir_vbles_p <- function(
       # Bloque D -----------------------
       pd02 = PB150,
       pd03 = dplyr::case_when(
+        # REVISAR CONSTRUCCION
         PE041 == 0   ~ 1,
         PE041 == 100 ~ 2,
         PE041 == 200 ~ 3,
@@ -179,6 +180,7 @@ construir_vbles_p_lmh <- function(.datos) {
       py01 = dplyr::if_else(py11 != 0 & pl09b == 1, py11, 0),
       py02 = dplyr::if_else(py11 != 0 & pl09b == 2, py11, 0),
       py03 = dplyr::if_else(py11 != 0 & pl09b == 3, py11, 0),
+      dplyr::across(py01:py03, \(y) y / 12, .names = "{.col}m"),
       dplyr::across(py01:py03, \(y) y / .haa, .names = "{.col}h"),
       .keep = "all"
     )
@@ -193,26 +195,14 @@ construir_vbles_p_lmh <- function(.datos) {
 #'
 #' @returns Conjunto de datos con ingresos individuales agregados a nivel hogar.
 agregar_personas <- function(.personas) {
-  if (attr(.personas, "bloques")["LMH"]) {
-    personas <- .personas |>
-      dplyr::summarise(
-        # Bloque Y -----------------------
-        dplyr::across(c(py01:py03, py04:py13), sum),
-        # Bloque P -----------------------
-        dplyr::across(c(py01:py03, py04:py13), \(y) sum(y != 0), .names = "x{.col}"),
-        .by = c(pi01, pi02, pi04)
-      )
-  } else {
-    personas <- .personas |>
-      dplyr::summarise(
-        # Bloque Y -----------------------
-        dplyr::across(py04:py13, sum),
-        # Bloque P -----------------------
-        dplyr::across(py04:py13, \(y) sum(y != 0), .names = "x{.col}"),
-        .by = c(pi01, pi02, pi04)
-      )
-  }
-
+  personas <- .personas |>
+    dplyr::summarise(
+      # Bloque Y -----------------------
+      dplyr::across(c(dplyr::any_of(c("py01", "py02", "py03")), py04:py13), sum),
+      # Bloque P -----------------------
+      dplyr::across(c(dplyr::any_of(c("py01", "py02", "py03")), py04:py13), \(y) sum(y != 0), .names = "x{.col}"),
+      .by = c(pi01, pi02, pi04)
+    )
   personas <- personas |>
     dplyr::rename_with(.cols = dplyr::starts_with("xpy"), .fn = \(n) sub("xpy", "hp", n))
 
@@ -251,11 +241,11 @@ construir_vbles_h <- function(
       hy20 = py12 + hy14 + hy15 + hy16,
       hy21 = py13 + hy14 + hy15 + hy16,
       dplyr::across(
-        .cols = c(py04:py13, hy14:hy21),
+        .cols = c(dplyr::starts_with("py"), dplyr::starts_with("hy")),
         .fns = \(y) y / 12, .names = "{.col}m"
       ),
       dplyr::across(
-        .cols = c(py04:py13, hy14:hy17, hy18:hy21),
+        .cols = c(dplyr::starts_with("py"), dplyr::starts_with("hy")),
         .fns = \(y) y / hd01, .names = "{.col}pc"
       ),
       hyxxq = "py01 a hy21 / PPA correspondiente",
