@@ -67,8 +67,8 @@ expandir_personas <- function(
   }
 
   if (bloques["R"]) {
-    R <- dplyr::select(.R, dplyr::any_of(c("RB010", "RB020", "RB030", "RB080",
-                                           "RB081", "RB082", "RB280", "RB290")))
+    R <- dplyr::select(.R, RB010, RB020, RB030, RB080,
+                       dplyr::any_of(c("RB081", "RB082", "RB280", "RB290")))
     datos <- dplyr::left_join(
       datos, R,
       by = dplyr::join_by(PB010 == RB010, PB020 == RB020, PB030 == RB030)
@@ -105,14 +105,16 @@ expandir_personas <- function(
 
   # Arreglos y devolver ------------------------------------------------------
   if (!.expandir) {
-    datos <- dplyr::select(datos, -dplyr::any_of(c(names(.datos), names(.R))))
+    datos <- dplyr::select(
+      datos,
+      dplyr::starts_with(c("pi", "pd", "pl", "py", "."), ignore.case = FALSE)
+    )
+  } else {
+    datos <- dplyr::relocate(
+      datos,
+      dplyr::starts_with(c("pi", "pd", "pl", "py"), ignore.case = FALSE)
+    )
   }
-
-  datos <- dplyr::relocate(
-    datos,
-    dplyr::starts_with(c("pi", "pd", "pl", "py"), ignore.case = FALSE),
-    dplyr::everything()
-  )
 
   attr(datos, "bloques") <- bloques
   attr(datos, "base") <- "P"

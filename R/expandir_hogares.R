@@ -15,7 +15,7 @@ expandir_hogares <- function(
     .D = NULL,
     .expandir = FALSE
 ) {
-  # Chequeos args ----------------------
+  # Chequeos args ------------------------------------------------------------
   if (!is.data.frame(.datos)) {
     rlang::abort("`.datos` debe ser un data.frame o tibble.")
   }
@@ -32,7 +32,7 @@ expandir_hogares <- function(
     rlang::abort("`.D` debe ser un data.frame o tibble.")
   }
 
-  # Calcular vbles ---------------------
+  # Calcular vbles -----------------------------------------------------------
   bloques <- c(D = !is.null(.D), attr(.P, "bloques")["LMH"])
 
   P <- agregar_personas(.P)
@@ -71,16 +71,19 @@ expandir_hogares <- function(
     rlang::warn("No se encontro `PL130` o `PL230` en `.P`. Se omiten: `py01`, `py02`, `py03`.")
   }
 
-  # Arreglos y devolver ----------------
+  # Arreglos y devolver ------------------------------------------------------
   if (!.expandir) {
-    datos <- dplyr::select(datos, -dplyr::any_of(c(names(.datos), names(.D))))
+    datos <- dplyr::select(
+      datos,
+      dplyr::starts_with(c("hi", "hd", "hl", "py", "hy", "hp"), ignore.case = FALSE)
+    )
+  } else {
+    datos <- dplyr::relocate(
+      datos,
+      dplyr::starts_with(c("hi", "hd", "hl", "py", "hy", "hp"), ignore.case = FALSE),
+      dplyr::everything()
+    )
   }
-
-  datos <- dplyr::relocate(
-    datos,
-    dplyr::starts_with(c("hi", "hd", "hl", "py", "hy", "hp"), ignore.case = FALSE),
-    dplyr::everything()
-  )
 
   attr(datos, "bloques") <- bloques
   attr(datos, "base") <- "H"
