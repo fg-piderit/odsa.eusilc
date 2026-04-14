@@ -32,64 +32,49 @@ expandir_hogares <- function(
     rlang::abort("`.D` debe ser un data.frame o tibble.")
   }
 
-  # Calcular vbles -----------------------------------------------------------
+  # Chequear bloques ---------------------------------------------------------
   bloques <- c(D = !is.null(.D), attr(.P, "bloques")["LMH"])
-
-  P <- agregar_personas(.P)
-  datos <- dplyr::left_join(
-    .datos, P,
-    by = dplyr::join_by(HB010 == pi01, HB020 == pi02, HB030 == pi04)
-  )
-
-  datos <- construir_vbles_h(datos, P)
 
   if (bloques["D"]) {
     D <- dplyr::select(.D, DB010, DB020, DB030, DB040, DB090)
-    datos <- dplyr::left_join(
-      datos, D, by = dplyr::join_by(HB010 == DB010, HB020 == DB020, HB030 == DB030)
+    .datos <- dplyr::left_join(
+      .datos, D, by = dplyr::join_by(HB010 == DB010, HB020 == DB020, HB030 == DB030)
     )
-    datos <- dplyr::rename(datos, hi06 = DB090)
   } else {
-    rlang::warn("No se proporciono el conjunto D. Se omiten: `hi06`.")
+    .datos <- dplyr::mutate(.datos, DB090 = NA)
+    rlang::warn("No se proporciono el conjunto D. Se pierde: `hi06`.")
   }
 
-  if (bloques["LMH"]) {
-    datos <- datos |>
-      dplyr::mutate(
-        dplyr::across(
-          .cols = c(py01:py03),
-          .fns = \(y) y / 12, .names = "{.col}m"
-        ),
-        dplyr::across(
-          .cols = c(py01:py03),
-          .fns = \(y) y / hd01, .names = "{.col}c"
-        ),
-        hyxxq = "py01 a py03 / PPA correspondiente",
-        .keep = "all"
-      )
-  } else {
-    rlang::warn("No se encontro `PL130` o `PL230` en `.P`. Se omiten: `py01`, `py02`, `py03`.")
+  if (!bloques["LMH"]) {
+    rlang::warn("No se encontro `PL130` o `PL230` en `.P`. Se pierden: `py01`, `py02`, `py03`.")
   }
+
+  # Calcular vbles -----------------------------------------------------------
+  P <- agregar_personas(.P)
+  .datos <- dplyr::left_join(
+    .datos, P,
+    by = dplyr::join_by(HB010 == pi01, HB020 == pi02, HB030 == pi04)
+  )
+  .datos <- construir_vbles_h(.datos)
 
   # Arreglos y devolver ------------------------------------------------------
   if (!.expandir) {
-    datos <- dplyr::select(
-      datos,
+    .datos <- dplyr::select(
+      .datos,
       dplyr::starts_with(c("hi", "hd", "hl", "py", "hy", "hp"), ignore.case = FALSE)
     )
   } else {
-    datos <- dplyr::relocate(
-      datos,
-      dplyr::starts_with(c("hi", "hd", "hl", "py", "hy", "hp"), ignore.case = FALSE),
-      dplyr::everything()
+    .datos <- dplyr::relocate(
+      .datos,
+      dplyr::starts_with(c("hi", "hd", "hl", "py", "hy", "hp"), ignore.case = FALSE)
     )
   }
 
-  attr(datos, "base") <- "H"
-  attr(datos, "bloques") <- bloques
-  attr(datos, "expandida") <- .expandir
+  attr(.datos, "base") <- "H"
+  attr(.datos, "bloques") <- bloques
+  attr(.datos, "expandida") <- .expandir
 
-  return(datos)
+  return(.datos)
 }
 
 # ============================================================================
@@ -102,9 +87,9 @@ agregar_personas <- function(.personas) {
   personas <- .personas |>
     dplyr::summarise(
       # Bloque Y -----------------------
-      dplyr::across(c(dplyr::any_of(c("py01", "py02", "py03")), py04:py13), sum),
+      dplyr::across(c(py01:py03, py04:py13), sum),
       # Bloque P -----------------------
-      dplyr::across(c(dplyr::any_of(c("py01", "py02", "py03")), py04:py13), \(y) sum(y != 0), .names = "x{.col}"),
+      dplyr::across(c(py01:py03, py04:py13), \(y) sum(y != 0), .names = "x{.col}"),
       .by = c(pi01, pi02, pi04)
     )
   personas <- personas |>
@@ -131,6 +116,7 @@ construir_vbles_h <- function(
       hi01 = HB010,
       hi02 = HB020,
       hi04 = HB030,
+      hi06 = DB090,
       # Bloque D -----------------------
       hd01 = HX040,
       hd02a = "A definir",
@@ -146,11 +132,11 @@ construir_vbles_h <- function(
       hy20 = py12 + hy14 + hy15 + hy16,
       hy21 = py13 + hy14 + hy15 + hy16,
       dplyr::across(
-        .cols = c(dplyr::any_of(c("py01", "py02", "py03")), py04:py13, hy14:hy21),
+        .cols = c(py01:py03, py04:py13, hy14:hy21),
         .fns = \(y) y / 12, .names = "{.col}m"
       ),
       dplyr::across(
-        .cols = c(dplyr::any_of(c("py01", "py02", "py03")), py04:py13, hy14:hy21),
+        .cols = c(py01:py03, py04:py13, hy14:hy21),
         .fns = \(y) y / hd01, .names = "{.col}pc"
       ),
       hyxxq = "py01 a hy21 / PPA correspondiente",
