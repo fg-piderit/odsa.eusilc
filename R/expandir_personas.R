@@ -29,7 +29,7 @@ expandir_personas <- function(
     rlang::abort("`.expandir` debe ser `TRUE` o `FALSE`.")
   }
 
-  # Chequeos bloques ---------------------------------------------------------
+  # Arreglos bloques ---------------------------------------------------------
   anio <- unique(.datos$PB010)
   bloques <- c(
     D = !is.null(.D),
@@ -40,10 +40,11 @@ expandir_personas <- function(
   if (anio <= 2021) {
     .datos <- dplyr::mutate(
       .datos,
-      RB081 = NA,
-      RB082 = NA,
-      RB280 = NA,
-      RB290 = NA,
+      RB080 = PB140,
+      RB081 = PB010 - PB140 - 1,
+      RB082 = PB110 - PB140 - (PB130 > PB100),
+      RB280 = PB210,
+      RB290 = PB220A,
       PE041 = PE040,
       PL032 = dplyr::case_when(
         PL031 %in% 1:4 ~ 1,
@@ -55,7 +56,23 @@ expandir_personas <- function(
       PL051A = PL051,
       PL111A = PL111
     )
-    rlang::warn("La base es anterior a 2021. Se pierden: `pd01a`, `pd01b`, `pd04`, `pd05`.")
+    rlang::warn("La base es anterior a 2021.")
+  } else if (bloques["R"]) {
+    .datos <- dplyr::left_join(
+      x = .datos,
+      y = dplyr::select(.R, RB010, RB020, RB030, RB080, RB081, RB082, RB280, RB290),
+      by = dplyr::join_by(PB010 == RB010, PB020 == RB020, PB030 == RB030)
+    )
+  } else {
+    .datos <- dplyr::mutate(
+      .datos,
+      RB080 = PB010 - PX020 -1,
+      RB081 = PX020,
+      RB082 = NA,
+      RB280 = NA,
+      RB290 = NA
+    )
+    rlang::warn("No se proporciono el conjunto R. Se pierden: `pd01a`, `pd04`, `pd05`.")
   }
 
   if (bloques["D"]) {
@@ -67,20 +84,6 @@ expandir_personas <- function(
   } else {
     .datos <- dplyr::mutate(.datos, DB040 = NA)
     rlang::warn("No se proporciono el conjunto D. Se pierden: `pi03`.")
-  }
-
-  if (bloques["R"]) {
-    .datos <- dplyr::left_join(
-      x = .datos,
-      y = dplyr::select(.R, RB010, RB020, RB030, RB080,
-                        dplyr::any_of(c("RB081", "RB082", "RB280", "RB290"))),
-      by = dplyr::join_by(PB010 == RB010, PB020 == RB020, PB030 == RB030)
-    )
-  } else {
-    .datos <- dplyr::mutate(
-      .datos, RB080 = NA, RB081 = NA, RB082 = NA, RB280 = NA, RB290 = NA
-    )
-    rlang::warn("No se proporciono el conjunto R. Se pierden: `pd01a`, `pd01b`, `pd01c`, `pd04`, `pd05`.")
   }
 
   if (!bloques["LMH"]) {
