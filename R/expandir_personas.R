@@ -59,9 +59,9 @@ expandir_personas <- function(
   }
 
   if (bloques["D"]) {
-    D <- dplyr::select(.D, DB010, DB020, DB030, DB040)
     .datos <- dplyr::left_join(
-      .datos, D,
+      x = .datos,
+      y = dplyr::select(.D, DB010, DB020, DB030, DB040),
       by = dplyr::join_by(PB010 == DB010, PB020 == DB020, PX030 == DB030)
     )
   } else {
@@ -70,10 +70,10 @@ expandir_personas <- function(
   }
 
   if (bloques["R"]) {
-    R <- dplyr::select(.R, RB010, RB020, RB030, RB080,
-                       dplyr::any_of(c("RB081", "RB082", "RB280", "RB290")))
     .datos <- dplyr::left_join(
-      .datos, R,
+      x = .datos,
+      y = dplyr::select(.R, RB010, RB020, RB030, RB080,
+                        dplyr::any_of(c("RB081", "RB082", "RB280", "RB290"))),
       by = dplyr::join_by(PB010 == RB010, PB020 == RB020, PB030 == RB030)
     )
   } else {
@@ -304,66 +304,3 @@ construir_vbles_p <- function(
   # ------------------------------------------
   return(datos)
 }
-
-# ============================================================================
-#' Construye variables dependientes del módulo Labour Market and Housing de
-#' la base P de la EU-SILC
-#'
-#' @param .datos Conjunto P de la EU-SILC expandido con [construir_vbles_p()].
-#'
-#' @returns Conjunto P de la EU-SILC con variables adicionales.
-construir_vbles_p_lmh <- function(.datos) {
-  datos <- .datos |>
-    dplyr::mutate(
-      # Bloque L -----------------------
-      pl06a = dplyr::case_when(
-        PL130 <= 5 ~ 1,
-        PL130 > 5 & PL130 <= 9 ~ 2,
-        PL130 > 9 & PL130 <= 11 ~ 3,
-        PL130 > 11 & PL130 <= 13 ~ 4,
-        .default = NA
-      ),
-      pl06b = dplyr::case_when(
-        PL130 <= 5 ~ 1,
-        PL130 > 5 & PL130 <= 11 ~ 2,
-        PL130 > 11 & PL130 <= 13 ~ 3,
-        .default = NA
-      ),
-      pl07 = dplyr::case_when(
-        PL230 == 1 ~ 1,
-        PL230 == 2 ~ 2,
-        PL230 == 3 ~ 3,
-        .default = NA
-      ),
-      pl09a = dplyr::case_when(
-        PL040A == 1 & pl06b > 1 ~ 1,
-        PL040A == 2 & pl08b == 1 ~ 2,
-        pl02 == 1 & pl07 == 1 ~ 3,
-        PL040A == 3 & pl07 == 2 & pl06b == 3 ~ 4,
-        PL040A == 3 & pl07 == 2 & pl06b == 2 ~ 5,
-        PL040A == 1 & pl06b == 1 ~ 6,
-        PL040A == 2 & pl08b == 2 ~ 7,
-        PL040A == 3 & pl07 == 2 & pl06b == 1 ~ 8,
-        PL040A == 4 ~ 8,
-        pl02 == 1 & pl05 == 8 ~ 9,
-        .default = NA
-      ),
-      pl09b = dplyr::case_when(
-        pl09a == 3 ~ 1,
-        pl09a %in% c(1, 2, 4, 5, 9) ~ 2,
-        pl09a %in% c(7, 8) ~ 3,
-        .default = NA
-      ),
-      # Bloque Y -----------------------
-      py01 = dplyr::if_else(py11 != 0 & pl09b == 1, py11, 0),
-      py02 = dplyr::if_else(py11 != 0 & pl09b == 2, py11, 0),
-      py03 = dplyr::if_else(py11 != 0 & pl09b == 3, py11, 0),
-      dplyr::across(py01:py03, \(y) y / 12, .names = "{.col}m"),
-      dplyr::across(py01:py03, \(y) y / .haa, .names = "{.col}h"),
-      .keep = "all"
-    )
-
-  # ------------------------------------------
-  return(datos)
-}
-

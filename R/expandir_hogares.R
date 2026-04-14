@@ -36,9 +36,10 @@ expandir_hogares <- function(
   bloques <- c(D = !is.null(.D), attr(.P, "bloques")["LMH"])
 
   if (bloques["D"]) {
-    D <- dplyr::select(.D, DB010, DB020, DB030, DB040, DB090)
     .datos <- dplyr::left_join(
-      .datos, D, by = dplyr::join_by(HB010 == DB010, HB020 == DB020, HB030 == DB030)
+      x = .datos,
+      y = dplyr::select(.D, DB010, DB020, DB030, DB040, DB090),
+      by = dplyr::join_by(HB010 == DB010, HB020 == DB020, HB030 == DB030)
     )
   } else {
     .datos <- dplyr::mutate(.datos, DB090 = NA)
@@ -52,7 +53,7 @@ expandir_hogares <- function(
   # Calcular vbles -----------------------------------------------------------
   P <- agregar_personas(.P)
   .datos <- dplyr::left_join(
-    .datos, P,
+    x = .datos, y = P,
     by = dplyr::join_by(HB010 == pi01, HB020 == pi02, HB030 == pi04)
   )
   .datos <- construir_vbles_h(.datos)
