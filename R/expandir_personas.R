@@ -66,7 +66,7 @@ expandir_personas <- function(
   } else {
     .datos <- dplyr::mutate(
       .datos,
-      RB080 = PB010 - PX020 -1,
+      RB080 = PB010 - PX020 - 1,
       RB081 = PX020,
       RB082 = NA,
       RB280 = NA,
@@ -140,6 +140,7 @@ construir_vbles_p <- function(
       pd01c = PB010 - agrupar_nac(PB010, RB080) - 1,
       pd02 = PB150,
       pd03 = dplyr::case_when(
+        # LOOKUP TABLE?
         # REVISAR CONSTRUCCION
         PE041 == 0   ~ 1,
         PE041 == 100 ~ 2,
@@ -159,6 +160,7 @@ construir_vbles_p <- function(
       # Bloque L -----------------------
       pl01 = "a definir",
       pl02 = dplyr::case_when(
+        # LOOKUP TABLE?
         PL032 == 1 ~ 1,
         PL032 == 2 ~ 2,
         PL032 %in% 3:8 ~ 3,
@@ -168,6 +170,7 @@ construir_vbles_p <- function(
       pl03b = PL051A %/% 10,
       pl04 = PL040A,
       pl05 = dplyr::case_when(
+        # LOOKUP TABLE?
         PL111A == "b - e" ~ 1,
         PL111A == "f" ~ 2,
         PL111A == "g" ~ 3,
@@ -184,6 +187,7 @@ construir_vbles_p <- function(
         .default = NA
       ),
       pl06a = dplyr::case_when(
+        # LOOKUP TABLE?
         PL130 <= 5 ~ 1,
         PL130 > 5 & PL130 <= 9 ~ 2,
         PL130 > 9 & PL130 <= 11 ~ 3,
@@ -191,18 +195,15 @@ construir_vbles_p <- function(
         .default = NA
       ),
       pl06b = dplyr::case_when(
+        # LOOKUP TABLE?
         PL130 <= 5 ~ 1,
         PL130 > 5 & PL130 <= 11 ~ 2,
         PL130 > 11 & PL130 <= 13 ~ 3,
         .default = NA
       ),
-      pl07 = dplyr::case_when(
-        PL230 == 1 ~ 1,
-        PL230 == 2 ~ 2,
-        PL230 == 3 ~ 3,
-        .default = NA
-      ),
+      pl07 = dplyr::if_else(PL230 != 99, PL230, NA),
       pl08a = dplyr::case_when(
+        # LOOKUP TABLE?
         PL051A %in% 11:13 | PL051A %/% 10 == 2 | PL051A == 1 ~ 1,
         PL051A == 14 | PL051A %/% 10 == 3 ~ 2,
         PL051A %/% 10 %in% 4:8 | PL051A == 2 ~ 3,
@@ -210,6 +211,7 @@ construir_vbles_p <- function(
         .default = NA
       ),
       pl08b = dplyr::case_when(
+        # LOOKUP TABLE?
         PL051A == 2 | (PL051A >= 20 & PL051A <= 35) ~ 1,
         !is.na(PL051A) ~ 2,
         .default = NA
@@ -235,6 +237,7 @@ construir_vbles_p <- function(
         .default = NA
       ),
       .pl10 = dplyr::case_when(
+        # LOOKUP TABLE?
         PL051A %in% c(1, 11:26) ~ 1,
         PL051A %in% c(2, 31:35) ~ 3,
         PL051A %in% c(3, 41:44) ~ 4,
@@ -278,13 +281,13 @@ construir_vbles_p <- function(
       py12 = py08 + py09 + py10,
       py13 = py11 + py12,
       py01 = dplyr::case_when(
-        # REVISAR CONSTRUCCIÓN
+        # REVISAR CONSTRUCCION
         is.na(pl09b) ~ NA,
         py11 != 0 & pl09b == 1 ~ py11,
         .default = 0
       ),
       py02 = dplyr::case_when(
-        # REVISAR CONSTRUCCIÓN
+        # REVISAR CONSTRUCCION
         is.na(pl09b) ~ NA,
         py11 != 0 & pl09b == 2 ~ py11,
         .default = 0

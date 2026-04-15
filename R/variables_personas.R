@@ -17,3 +17,38 @@ agrupar_nac <- function(.anio, .nac) {
   nac_agrup <- dplyr::if_else(nac_agrup < .anio, nac_agrup, .anio)
   return(nac_agrup)
 }
+
+#' Title
+#'
+#' @param .PL040A PL040A
+#' @param .pl06b pl06b
+#' @param .pl08b pl08b
+#' @param .lmh lmh
+#'
+#' @returns heterogeneidad
+calc_heterogeneidad <- function(.PL040A, .pl06b, .pl08b, .lmh = TRUE) {
+
+}
+
+#' Title
+#'
+#' @param .PL051A PL051A
+#' @param .PL040A PL040A
+#' @param .PL150 PL150
+#' @param .lmh lmh
+#'
+#' @returns egp
+calc_egp <- function(.PL051A, .PL040A, .PL150, .lmh = TRUE) {
+
+}
+
+#' Title
+#'
+#' @param .PL040A PL040A
+#' @param .PY030G PY030G
+#' @param .PY035G PY035G
+#'
+#' @returns informalidad
+calc_informalidad <- function(.PL040A, .PY030G, .PY035G) {
+
+}

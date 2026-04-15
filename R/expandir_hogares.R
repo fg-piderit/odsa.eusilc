@@ -81,7 +81,7 @@ expandir_hogares <- function(
 # ============================================================================
 #' Agrega variables de ingreso de la base P de la EU-SILC a nivel hogar.
 #'
-#' @param .personas Conjunto P de la EU-SILC expandido con [construir_vbles_p()] y, opcionalmente, con [construir_vbles_p_lmh()].
+#' @param .personas Conjunto P de la EU-SILC expandido con [construir_vbles_p()].
 #'
 #' @returns Conjunto de datos con ingresos individuales agregados a nivel hogar.
 agregar_personas <- function(.personas) {
