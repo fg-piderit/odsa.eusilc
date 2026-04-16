@@ -50,7 +50,7 @@ expandir_personas <- function(
         PL031 %in% 1:4 ~ 1,
         PL031 %in% 5 ~ 2,
         PL031 %in% 6:11 ~ 3,
-        .default = NA
+        .default = NA_integer_
       ),
       PL040A = PL040,
       PL051A = PL051,
@@ -68,9 +68,9 @@ expandir_personas <- function(
       .datos,
       RB080 = PB010 - PX020 - 1,
       RB081 = PX020,
-      RB082 = NA,
-      RB280 = NA,
-      RB290 = NA
+      RB082 = NA_integer_,
+      RB280 = NA_integer_,
+      RB290 = NA_integer_
     )
     rlang::warn("No se proporciono el conjunto R. Se pierden: `pd01a`, `pd04`, `pd05`.")
   }
@@ -82,12 +82,12 @@ expandir_personas <- function(
       by = dplyr::join_by(PB010 == DB010, PB020 == DB020, PX030 == DB030)
     )
   } else {
-    .datos <- dplyr::mutate(.datos, DB040 = NA)
+    .datos <- dplyr::mutate(.datos, DB040 = NA_character_)
     rlang::warn("No se proporciono el conjunto D. Se pierden: `pi03`.")
   }
 
   if (!bloques["LMH"]) {
-    .datos <- dplyr::mutate(.datos, PL130 = NA, PL230 = NA)
+    .datos <- dplyr::mutate(.datos, PL130 = NA_integer_, PL230 = NA_integer_)
     rlang::warn("No se encontro `PL130` o `PL230`. Se pierden: `pl06a`, `pl06b`, `pl07`, `pl09a`, `pl09b`, `py01`, `py02`, `py03`.")
   }
 
@@ -98,7 +98,7 @@ expandir_personas <- function(
   if (!.expandir) {
     .datos <- dplyr::select(
       .datos,
-      dplyr::starts_with(c("pi", "pd", "pl", "py", "."), ignore.case = FALSE)
+      dplyr::starts_with(c("pi", "pd", "pl", "py"), ignore.case = FALSE)
     )
   } else {
     .datos <- dplyr::relocate(
@@ -153,18 +153,18 @@ construir_vbles_p <- function(
         PE041 == 354 ~ 4,
         PE041 == 450 ~ 5,
         PE041 == 500 ~ 6,
-        .default = NA
+        .default = NA_integer_
       ),
       pd04 = dplyr::if_else(RB280 == pi02, 1, 2),
       pd05 = dplyr::if_else(RB290 == pi02, 1, 2),
       # Bloque L -----------------------
-      pl01 = "a definir",
+      pl01 = NA_integer_,
       pl02 = dplyr::case_when(
         # LOOKUP TABLE?
         PL032 == 1 ~ 1,
         PL032 == 2 ~ 2,
         PL032 %in% 3:8 ~ 3,
-        .default = NA
+        .default = NA_integer_
       ),
       pl03a = PL051A,
       pl03b = PL051A %/% 10,
@@ -184,7 +184,7 @@ construir_vbles_p <- function(
         PL111A == "q" ~ 7,
         PL111A == "r - u" ~ 9,
         PL111A == "a" ~ 9,
-        .default = NA
+        .default = NA_integer_
       ),
       pl06a = dplyr::case_when(
         # LOOKUP TABLE?
@@ -192,32 +192,31 @@ construir_vbles_p <- function(
         PL130 > 5 & PL130 <= 9 ~ 2,
         PL130 > 9 & PL130 <= 11 ~ 3,
         PL130 > 11 & PL130 <= 13 ~ 4,
-        .default = NA
+        .default = NA_integer_
       ),
       pl06b = dplyr::case_when(
         # LOOKUP TABLE?
         PL130 <= 5 ~ 1,
         PL130 > 5 & PL130 <= 11 ~ 2,
         PL130 > 11 & PL130 <= 13 ~ 3,
-        .default = NA
+        .default = NA_integer_
       ),
-      pl07 = dplyr::if_else(PL230 != 99, PL230, NA),
+      pl07 = dplyr::if_else(PL230 != 99, PL230, NA_integer_),
       pl08a = dplyr::case_when(
         # LOOKUP TABLE?
         PL051A %in% 11:13 | PL051A %/% 10 == 2 | PL051A == 1 ~ 1,
         PL051A == 14 | PL051A %/% 10 == 3 ~ 2,
         PL051A %/% 10 %in% 4:8 | PL051A == 2 ~ 3,
         PL051A %/% 10 == 9 | PL051A == 3 ~ 4,
-        .default = NA
+        .default = NA_integer_
       ),
       pl08b = dplyr::case_when(
         # LOOKUP TABLE?
         PL051A == 2 | (PL051A >= 20 & PL051A <= 35) ~ 1,
         !is.na(PL051A) ~ 2,
-        .default = NA
+        .default = NA_integer_
       ),
       pl09a = dplyr::case_when(
-        is.na(PL130) | is.na(PL230) ~ NA,
         PL040A == 1 & pl06b > 1 ~ 1,
         PL040A == 2 & pl08b == 1 ~ 2,
         pl02 == 1 & pl07 == 1 ~ 3,
@@ -228,13 +227,13 @@ construir_vbles_p <- function(
         PL040A == 3 & pl07 == 2 & pl06b == 1 ~ 8,
         PL040A == 4 ~ 8,
         pl02 == 1 & pl05 == 8 ~ 9,
-        .default = NA
+        .default = NA_integer_
       ),
       pl09b = dplyr::case_when(
         pl09a == 3 ~ 1,
         pl09a %in% c(1, 2, 4, 5, 9) ~ 2,
         pl09a %in% c(7, 8) ~ 3,
-        .default = NA
+        .default = NA_integer_
       ),
       .pl10 = dplyr::case_when(
         # LOOKUP TABLE?
@@ -245,15 +244,15 @@ construir_vbles_p <- function(
         PL051A %in% c(61, 62, 92) ~ 10,
         PL051A %in%   71:83 ~ 8,
         PL051A %in% c(91, 93:96) ~ 9,
-        .default = NA
+        .default = NA_integer_
       ),
       pl10 = dplyr::case_when(
         .pl10 == 8 & PL040A != 1 ~ 8,
         .pl10 > 1 & PL040A == 1 ~ 2,
         .pl10 > 1 & PL040A == 2 ~ 6,
-        .pl10 > 1 & is.na(PL040A) ~ NA,
+        .pl10 > 1 & is.na(PL040A) ~ NA_integer_,
         .pl10 > 2 & PL150 == 1 ~ 7,
-        .pl10 > 2 & is.na(PL150) ~ NA,
+        .pl10 > 2 & is.na(PL150) ~ NA_integer_,
         .default = .pl10
       ),
       pl11a = dplyr::case_when(
@@ -262,12 +261,12 @@ construir_vbles_p <- function(
         PL040A %in% 1:2 & !(PY030G == 0 & PY035G == 0) ~ 3,
         PL040A %in% 1:2 & PY030G == 0 & PY035G == 0 ~ 4,
         PL040A == 4 ~ 4,
-        .default = NA
+        .default = NA_integer_
       ),
       pl11b = dplyr::case_when(
         pl11a %in% c(1, 3) ~ 1,
         pl11a %in% c(2, 4) ~ 2,
-        .default = NA
+        .default = NA_integer_
       ),
       # Bloque Y -----------------------
       py04 = PY010N,
@@ -282,19 +281,19 @@ construir_vbles_p <- function(
       py13 = py11 + py12,
       py01 = dplyr::case_when(
         # REVISAR CONSTRUCCION
-        is.na(pl09b) ~ NA,
+        is.na(pl09b) ~ NA_real_,
         py11 != 0 & pl09b == 1 ~ py11,
         .default = 0
       ),
       py02 = dplyr::case_when(
         # REVISAR CONSTRUCCION
-        is.na(pl09b) ~ NA,
+        is.na(pl09b) ~ NA_real_,
         py11 != 0 & pl09b == 2 ~ py11,
         .default = 0
       ),
       py03 = dplyr::case_when(
         # REVISAR CONSTRUCCIÓN
-        is.na(PL130) ~ NA,
+        is.na(PL130) ~ NA_real_,
         py11 != 0 & pl09b == 3 ~ py11,
         .default = 0
       ),
@@ -302,8 +301,8 @@ construir_vbles_p <- function(
       .han = (PL075 + PL076) * PL060 * 4.2,
       py04h = py04 / .haa,
       py05h = py05 / .han,
-      dplyr::across(py04:py13, \(y) y / 12, .names = "{.col}m"),
-      pyxxq = "py01 a py13 (h y m) / PPA correspondiente",
+      dplyr::across(py01:py13, \(y) y / 12, .names = "{.col}m"),
+      #pyxxq = "py01 a py13 (h y m) / PPA correspondiente",
       .keep = "all"
     )
 

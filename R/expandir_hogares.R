@@ -85,6 +85,7 @@ expandir_hogares <- function(
 #'
 #' @returns Conjunto de datos con ingresos individuales agregados a nivel hogar.
 agregar_personas <- function(.personas) {
+  # OPTIMIZAR, ES MUY LENTA
   personas <- .personas |>
     dplyr::summarise(
       # Bloque Y -----------------------
@@ -140,7 +141,7 @@ construir_vbles_h <- function(
         .cols = c(py01:py03, py04:py13, hy14:hy21),
         .fns = \(y) y / hd01, .names = "{.col}pc"
       ),
-      hyxxq = "py01 a hy21 / PPA correspondiente",
+      #hyxxq = "py01 a hy21 / PPA correspondiente",
       .keep = "all"
     )
 
