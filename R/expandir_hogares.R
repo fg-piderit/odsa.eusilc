@@ -56,6 +56,11 @@ expandir_hogares <- function(
     x = .datos, y = P,
     by = dplyr::join_by(HB010 == pi01, HB020 == pi02, HB030 == pi04)
   )
+  .datos <- dplyr::left_join(
+    x = .datos,
+    y = tabla_ppa,
+    by = dplyr::join_by(HB010 == PB010, HB020 == PB020)
+  )
   .datos <- construir_vbles_h(.datos)
 
   # Arreglos y devolver ------------------------------------------------------
@@ -121,8 +126,8 @@ construir_vbles_h <- function(
       hi06 = DB090,
       # Bloque D -----------------------
       hd01 = HX040,
-      hd02a = "A definir",
-      hd02b = "A definir",
+      hd02a = NA_integer_,
+      hd02b = NA_integer_,
       # Bloque L -----------------------
       # Bloque Y -----------------------
       hy14 = HY040N + HY090N,
@@ -141,7 +146,11 @@ construir_vbles_h <- function(
         .cols = c(py01:py03, py04:py13, hy14:hy21),
         .fns = \(y) y / hd01, .names = "{.col}pc"
       ),
-      #hyxxq = "py01 a hy21 / PPA correspondiente",
+      dplyr::across(
+        .cols = c(py01:py13, py01m:py13m, hy14:hy21, hy14m:hy21m),
+        .fns = \(y) y / ppa,
+        .names = "{.col}ppa"
+      ),
       .keep = "all"
     )
 

@@ -92,6 +92,11 @@ expandir_personas <- function(
   }
 
   # Calcular vbles -----------------------------------------------------------
+  .datos <- dplyr::left_join(
+    x = .datos,
+    y = tabla_ppa,
+    by = dplyr::join_by(PB010, PB020)
+  )
   .datos <- construir_vbles_p(.datos)
 
   # Arreglos y devolver ------------------------------------------------------
@@ -297,12 +302,13 @@ construir_vbles_p <- function(
         py11 != 0 & pl09b == 3 ~ py11,
         .default = 0
       ),
+      dplyr::across(c(py01:py03, py04:py13), \(y) y * PX010),
+      dplyr::across(c(py01:py03, py04:py13), \(y) y / 12, .names = "{.col}m"),
       .haa = (PL073 + PL074) * PL060 * 4.2,
       .han = (PL075 + PL076) * PL060 * 4.2,
       py04h = py04 / .haa,
       py05h = py05 / .han,
-      dplyr::across(py01:py13, \(y) y / 12, .names = "{.col}m"),
-      #pyxxq = "py01 a py13 (h y m) / PPA correspondiente",
+      dplyr::across(c(py01:py03, py04:py13, py01m:py13m, py04h, py05h), \(y) y / ppa, .names = "{.col}ppa"),
       .keep = "all"
     )
 
