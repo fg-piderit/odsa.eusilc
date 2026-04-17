@@ -13,4 +13,8 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Imports:
     dplyr,
+    labelled,
     rlang
+Depends: 
+    R (>= 3.5)
+LazyData: true
