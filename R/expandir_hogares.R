@@ -94,9 +94,9 @@ agregar_personas <- function(.personas) {
   personas <- .personas |>
     dplyr::summarise(
       # Bloque Y -----------------------
-      dplyr::across(c(py01:py03, py04:py13), sum),
+      dplyr::across(py00:py25, sum),
       # Bloque P -----------------------
-      dplyr::across(c(py01:py03, py04:py13), \(y) sum(y != 0), .names = "x{.col}"),
+      dplyr::across(py00:py25, \(y) sum(y != 0), .names = "x{.col}"),
       .by = c(pi01, pi02, pi04)
     )
   personas <- personas |>
@@ -130,24 +130,20 @@ construir_vbles_h <- function(
       hd02b = NA_integer_,
       # Bloque L -----------------------
       # Bloque Y -----------------------
-      hy14 = HY040N + HY090N,
-      hy15 = HY050N + HY060N + HY070N,
-      hy16 = HY080N + HY110N,
-      hy17 = hy14 + hy16,
-      hy18 = py08 + py09 + hy15,
-      hy19 = py10 + hy18,
-      hy20 = py12 + hy14 + hy15 + hy16,
-      hy21 = py13 + hy14 + hy15 + hy16,
+      hy00 = py00 + (HY040N + HY050N + HY060N + HY070N + HY080N + HY090N + HY110N) / 12,
+      hy20 = py20 + (HY040N + HY050N + HY060N + HY070N + HY080N + HY090N + HY110N) / 12,
+      hy21 = (HY040N + HY080N + HY090N + HY110N) / 12,
+      hy22 = (HY040N + HY090N) / 12,
+      hy23 = (HY080N + HY110N) / 12,
+      hy24 = py21 + py24 + py25 + (HY050N + HY060N + HY070N) / 12,
+      hy25 = py24 + py25 + (HY050N + HY060N + HY070N) / 12,
+      hy26 = (HY050N + HY060N + HY070N) / 12,
       dplyr::across(
-        .cols = c(py01:py03, py04:py13, hy14:hy21),
-        .fns = \(y) y / 12, .names = "{.col}m"
-      ),
-      dplyr::across(
-        .cols = c(py01:py03, py04:py13, hy14:hy21),
+        .cols = c(py00:py25, hy00:hy26),
         .fns = \(y) y / hd01, .names = "{.col}pc"
       ),
       dplyr::across(
-        .cols = c(py01:py13, py01m:py13m, hy14:hy21, hy14m:hy21m),
+        .cols = c(py00:py25, hy00:hy26),
         .fns = \(y) y / ppa,
         .names = "{.col}ppa"
       ),

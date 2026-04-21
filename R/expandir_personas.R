@@ -274,41 +274,40 @@ construir_vbles_p <- function(
         .default = NA_integer_
       ),
       # Bloque Y -----------------------
-      py04 = PY010N,
-      py05 = PY050N,
-      py06 = PY100N,
-      py07 = PY080N,
-      py08 = PY090N,
-      py09 = PY110N + PY120N + PY130N + PY140N,
-      py10 = py06 + py07,
-      py11 = py04 + py05,
-      py12 = py08 + py09 + py10,
-      py13 = py11 + py12,
-      py01 = dplyr::case_when(
+      py00 = PY010N + PY050N + PY090N + PY110N + PY120N + PY130N + PY140N + PY100N + PY080N,
+      py10 = PY010N + PY050N,
+      py11 = PY010N,
+      py12 = PY050N,
+      py13 = dplyr::case_when(
         # REVISAR CONSTRUCCION
         is.na(pl09b) ~ NA_real_,
-        py11 != 0 & pl09b == 1 ~ py11,
+        py10 != 0 & pl09b == 1 ~ py10,
         .default = 0
       ),
-      py02 = dplyr::case_when(
+      py14 = dplyr::case_when(
         # REVISAR CONSTRUCCION
         is.na(pl09b) ~ NA_real_,
-        py11 != 0 & pl09b == 2 ~ py11,
+        py10 != 0 & pl09b == 2 ~ py10,
         .default = 0
       ),
-      py03 = dplyr::case_when(
+      py15 = dplyr::case_when(
         # REVISAR CONSTRUCCIÓN
         is.na(PL130) ~ NA_real_,
-        py11 != 0 & pl09b == 3 ~ py11,
+        py10 != 0 & pl09b == 3 ~ py10,
         .default = 0
       ),
-      dplyr::across(c(py01:py03, py04:py13), \(y) y * PX010),
-      dplyr::across(c(py01:py03, py04:py13), \(y) y / 12, .names = "{.col}m"),
+      py20 = PY090N + PY110N + PY120N + PY130N + PY140N + PY100N + PY080N,
+      py21 = PY100N + PY080N,
+      py22 = PY100N,
+      py23 = PY080N,
+      py24 = PY090N,
+      py25 = PY110N + PY120N + PY130N + PY140N,
       .haa = (PL073 + PL074) * PL060 * 4.2,
       .han = (PL075 + PL076) * PL060 * 4.2,
-      py04h = py04 / .haa,
-      py05h = py05 / .han,
-      dplyr::across(c(py01:py03, py04:py13, py01m:py13m, py04h, py05h), \(y) y / ppa, .names = "{.col}ppa"),
+      py11h = py11 / .haa,
+      py12h = py12 / .han,
+      dplyr::across(py00:py25, \(y) (y * PX010) / 12),
+      dplyr::across(py00:py12h, \(y) y / ppa, .names = "{.col}ppa"),
       .keep = "all"
     )
 
