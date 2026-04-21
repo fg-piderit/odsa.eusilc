@@ -101,15 +101,9 @@ expandir_personas <- function(
 
   # Arreglos y devolver ------------------------------------------------------
   if (!.expandir) {
-    .datos <- dplyr::select(
-      .datos,
-      dplyr::starts_with(c("pi", "pd", "pl", "py"), ignore.case = FALSE)
-    )
+    .datos <- dplyr::select(.datos, dplyr::all_of(names(etq$P$variables)))
   } else {
-    .datos <- dplyr::relocate(
-      .datos,
-      dplyr::starts_with(c("pi", "pd", "pl", "py", "."), ignore.case = FALSE)
-    )
+    .datos <- dplyr::relocate(.datos, dplyr::all_of(names(etq$P$variables)))
   }
 
   attr(.datos, "base") <- "P"
@@ -280,19 +274,19 @@ construir_vbles_p <- function(
       py12 = PY050N,
       py13 = dplyr::case_when(
         # REVISAR CONSTRUCCION
-        is.na(pl09b) ~ NA_real_,
+        py10 != 0 & is.na(pl09b) ~ NA_real_,
         py10 != 0 & pl09b == 1 ~ py10,
         .default = 0
       ),
       py14 = dplyr::case_when(
         # REVISAR CONSTRUCCION
-        is.na(pl09b) ~ NA_real_,
+        py10 != 0 & is.na(pl09b) ~ NA_real_,
         py10 != 0 & pl09b == 2 ~ py10,
         .default = 0
       ),
       py15 = dplyr::case_when(
         # REVISAR CONSTRUCCIÓN
-        is.na(PL130) ~ NA_real_,
+        py10 != 0 & is.na(pl09b) ~ NA_real_,
         py10 != 0 & pl09b == 3 ~ py10,
         .default = 0
       ),

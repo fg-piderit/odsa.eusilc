@@ -65,15 +65,9 @@ expandir_hogares <- function(
 
   # Arreglos y devolver ------------------------------------------------------
   if (!.expandir) {
-    .datos <- dplyr::select(
-      .datos,
-      dplyr::starts_with(c("hi", "hd", "hl", "py", "hy", "hp"), ignore.case = FALSE)
-    )
+    .datos <- dplyr::select(.datos, dplyr::all_of(names(etq$H$variables)))
   } else {
-    .datos <- dplyr::relocate(
-      .datos,
-      dplyr::starts_with(c("hi", "hd", "hl", "py", "hy", "hp"), ignore.case = FALSE)
-    )
+    .datos <- dplyr::relocate(.datos, dplyr::all_of(names(etq$H$variables)))
   }
 
   attr(.datos, "base") <- "H"
@@ -92,12 +86,34 @@ expandir_hogares <- function(
 agregar_personas <- function(.personas) {
   # OPTIMIZAR, ES MUY LENTA
   personas <- .personas |>
+    dplyr::mutate(
+      dplyr::across(py00:py25, \(y) as.integer(y != 0), .names = "x{.col}")
+    ) |>
     dplyr::summarise(
-      # Bloque Y -----------------------
-      dplyr::across(py00:py25, sum),
-      # Bloque P -----------------------
-      dplyr::across(py00:py25, \(y) sum(y != 0), .names = "x{.col}"),
+      dplyr::across(c(py00:py25, xpy00:xpy25), sum),
       .by = c(pi01, pi02, pi04)
+    )
+  personas <- personas |>
+    dplyr::rename_with(.cols = dplyr::starts_with("xpy"), .fn = \(n) sub("xpy", "hp", n))
+
+  # ------------------------------------------
+  return(personas)
+}
+
+# ============================================================================
+#' Agrega variables de ingreso de la base P de la EU-SILC a nivel hogar. (Optimizda)
+#'
+#' @param .personas Conjunto P de la EU-SILC expandido con [construir_vbles_p()].
+#'
+#' @returns Conjunto de datos con ingresos individuales agregados a nivel hogar.
+f_agregar_personas <- function(.personas) {
+  personas <- .personas |>
+    dplyr::select(pi01, pi02, pi04, py00:py25) |>
+    dplyr::mutate(
+      dplyr::across(py00:py25, \(y) as.integer(y != 0), .names = "x{.col}")
+    ) |>
+    collapse::collap(
+      by = ~ pi01 + pi02 + pi04, FUN = collapse::fsum, na.rm = FALSE
     )
   personas <- personas |>
     dplyr::rename_with(.cols = dplyr::starts_with("xpy"), .fn = \(n) sub("xpy", "hp", n))
