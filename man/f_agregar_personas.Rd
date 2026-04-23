@@ -7,7 +7,7 @@
 f_agregar_personas(.personas)
 }
 \arguments{
-\item{.personas}{Conjunto P de la EU-SILC expandido con \code{\link[=construir_vbles_p]{construir_vbles_p()}}.}
+\item{.personas}{Conjunto P de la EU-SILC expandido con \code{\link[=calc_personas]{calc_personas()}}.}
 }
 \value{
 Conjunto de datos con ingresos individuales agregados a nivel hogar.

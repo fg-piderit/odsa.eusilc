@@ -107,7 +107,7 @@ expandir_personas <- function(
     y = tabla_ppa,
     by = dplyr::join_by(PB010, PB020)
   )
-  .datos <- construir_vbles_p(.datos, .lmh = bloques["LMH"])
+  .datos <- calc_personas(.datos, .lmh = bloques["LMH"])
 
   # Arreglos y devolver ------------------------------------------------------
   if (!.expandir) {
@@ -131,7 +131,7 @@ expandir_personas <- function(
 #' @param ... ...
 #'
 #' @returns Conjunto de datos P de la EU-SILC con variables adicionales.
-construir_vbles_p <- function(
+calc_personas <- function(
     .datos,
     .lmh = FALSE,
     ...

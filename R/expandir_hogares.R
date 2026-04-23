@@ -61,7 +61,7 @@ expandir_hogares <- function(
     y = tabla_ppa,
     by = dplyr::join_by(HB010 == PB010, HB020 == PB020)
   )
-  .datos <- construir_vbles_h(.datos)
+  .datos <- calc_hogares(.datos)
 
   # Arreglos y devolver ------------------------------------------------------
   if (!.expandir) {
@@ -80,7 +80,7 @@ expandir_hogares <- function(
 # ============================================================================
 #' Agrega variables de ingreso de la base P de la EU-SILC a nivel hogar.
 #'
-#' @param .personas Conjunto P de la EU-SILC expandido con [construir_vbles_p()].
+#' @param .personas Conjunto P de la EU-SILC expandido con [calc_personas()].
 #'
 #' @returns Conjunto de datos con ingresos individuales agregados a nivel hogar.
 agregar_personas <- function(.personas) {
@@ -103,7 +103,7 @@ agregar_personas <- function(.personas) {
 # ============================================================================
 #' Agrega variables de ingreso de la base P de la EU-SILC a nivel hogar. (Optimizda)
 #'
-#' @param .personas Conjunto P de la EU-SILC expandido con [construir_vbles_p()].
+#' @param .personas Conjunto P de la EU-SILC expandido con [calc_personas()].
 #'
 #' @returns Conjunto de datos con ingresos individuales agregados a nivel hogar.
 f_agregar_personas <- function(.personas) {
@@ -129,7 +129,7 @@ f_agregar_personas <- function(.personas) {
 #' @param ... ...
 #'
 #' @returns Conjunto H de la EU-SILC con variables adicionales.
-construir_vbles_h <- function(
+calc_hogares <- function(
     .datos,
     ...
 ) {
