@@ -20,6 +20,27 @@ agrupar_nac <- function(.anio, .nac) {
 
 #' Title
 #'
+#' @param .PL130 PL130
+#' @param .lmh Módulo LMH
+#'
+#' @returns Tamaño del establecimiento
+calc_testablecimiento <- function(.PL130, .lmh = TRUE) {
+  if (.lmh) {
+    dplyr::case_when(
+      # LOOKUP TABLE?
+      .PL130 <= 5 ~ 1,
+      .PL130 > 5 & .PL130 <= 9 ~ 2,
+      .PL130 > 9 & .PL130 <= 11 ~ 3,
+      .PL130 > 11 & .PL130 <= 13 ~ 4,
+      .default = NA_integer_
+    )
+  } else {
+    NA_integer_
+  }
+}
+
+#' Title
+#'
 #' @param .PL040A PL040A
 #' @param .pl06b pl06b
 #' @param .pl08b pl08b

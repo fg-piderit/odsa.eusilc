@@ -4,10 +4,12 @@
 \alias{construir_vbles_p}
 \title{Construye variables en la base P de la EU-SILC.}
 \usage{
-construir_vbles_p(.datos, ...)
+construir_vbles_p(.datos, .lmh = FALSE, ...)
 }
 \arguments{
 \item{.datos}{Conjunto P de la EU-SILC.}
+
+\item{.lmh}{Si el conjunto de datos tiene el módulo LMH.}
 
 \item{...}{...}
 }

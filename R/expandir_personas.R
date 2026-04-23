@@ -97,7 +97,7 @@ expandir_personas <- function(
     y = tabla_ppa,
     by = dplyr::join_by(PB010, PB020)
   )
-  .datos <- construir_vbles_p(.datos)
+  .datos <- construir_vbles_p(.datos, .lmh = bloques["LMH"])
 
   # Arreglos y devolver ------------------------------------------------------
   if (!.expandir) {
@@ -117,11 +117,13 @@ expandir_personas <- function(
 #' Construye variables en la base P de la EU-SILC.
 #'
 #' @param .datos Conjunto P de la EU-SILC.
+#' @param .lmh Si el conjunto de datos tiene el módulo LMH.
 #' @param ... ...
 #'
 #' @returns Conjunto de datos P de la EU-SILC con variables adicionales.
 construir_vbles_p <- function(
     .datos,
+    .lmh = FALSE,
     ...
 ) {
   datos <- .datos |>
@@ -185,14 +187,15 @@ construir_vbles_p <- function(
         PL111A == "a" ~ 9,
         .default = NA_integer_
       ),
-      pl06a = dplyr::case_when(
-        # LOOKUP TABLE?
-        PL130 <= 5 ~ 1,
-        PL130 > 5 & PL130 <= 9 ~ 2,
-        PL130 > 9 & PL130 <= 11 ~ 3,
-        PL130 > 11 & PL130 <= 13 ~ 4,
-        .default = NA_integer_
-      ),
+      #pl06a = dplyr::case_when(
+      #  # LOOKUP TABLE?
+      #  PL130 <= 5 ~ 1,
+      #  PL130 > 5 & PL130 <= 9 ~ 2,
+      #  PL130 > 9 & PL130 <= 11 ~ 3,
+      #  PL130 > 11 & PL130 <= 13 ~ 4,
+      #  .default = NA_integer_
+      #),
+      pl06a = calc_testablecimiento(PL130, .lmh),
       pl06b = dplyr::case_when(
         # LOOKUP TABLE?
         PL130 <= 5 ~ 1,
