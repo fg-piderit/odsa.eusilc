@@ -3,19 +3,19 @@
 #' @param .datos Conjunto de datos P a imputar.
 #' @param .variables Grupo de variables a imputar.
 #' @param ... ...
-#' @param .N_imps Cantidad de conjuntos imputados a crear.
 #'
 #' @returns Conjunto de datos P con variables imputadas.
 #' @export
 imputar_personas <- function(
   .datos,
   .variables,
-  ...,
-  .N_imps = 10
+  ...
 ) {
   # Chequeos args ------------------------------------------------------------
 
   # Construccion flags -------------------------------------------------------
+  # Numero negativo indica grupo a imputar, mismo numero positivo indica grupo
+  # de referencia para entrenamiento
   .datos <- dplyr::mutate(
     .datos,
     .f_maa = dplyr::case_when(
@@ -46,57 +46,106 @@ imputar_personas <- function(
       PY010N != 0 & PL111B_F == -1 ~ -1,
       PY010N != 0 & PL111B_F == 1 ~ 1,
       .default = 0
+    ),
+    .f_PL130 = dplyr::case_when(
+      PL130 == 14 ~ -1,
+      PL130 < 10 ~ 1,
+      PL130 == 15 ~ -2,
+      PL130 >= 10 ~ 2,
+      .default = 0
     )
   )
 
   # Construccion vbles -------------------------------------------------------
   .datos <- dplyr::mutate(
     .datos,
-    .maa = dplyr::case_when(
+    maa = dplyr::case_when(
       .f_maa == -1 ~ NA_integer_,
       .default = PL073 + PL074
     ),
-    .man = dplyr::case_when(
+    man = dplyr::case_when(
       .f_man == -1 ~ NA_integer_,
       .default = PL075 + PL076
     )
   )
 
   # Imputacion ---------------------------------------------------------------
-  # Meses ------------------------------------
   # Random Forests para lidiar con la distribución atípica de los meses
-  # Imputación múltiple para mantener variabilidad
   # TODO: Selección de hiperparámetros
+  # Meses asalariados ------------------------
   datos_imp_maa <- .datos |>
-    dplyr::filter(.f_maa %in% c(-1, 1)) |>
-    dplyr::select(PB010, PB020, PB030, PY010N, PY050N, PB140, PB150, PE041, .maa, .f_maa)
+    dplyr::select(PB010, PB020, PB030, PY010N, PY050N, PB140, PB150, PE041, maa, .f_maa) |>
+    dplyr::filter(.f_maa %in% c(-1, 1))
 
-  imp_meses <- purrr::map(1:.N_imps, \(.i) {
-      imp <- missRanger::missRanger(
-        data = datos_imp_maa,
-        formula = .maa ~ PY010N + PB140 + PB150 + PE041,
-        num.trees = 100,
-        pmm.k = 10
-      )
-      imp <- dplyr::mutate(imp, imp = .i)
-      dplyr::filter(imp, .f_maa == -1)
-    }) |>
-    purrr::list_rbind() |>
-    dplyr::slice_sample(n = 1, by = PB030)
+  imp_maa <- missRanger::missRanger(
+    data = datos_imp_maa,
+    formula = maa ~ PY010N + PY050N + PB140 + PB150 + PE041,
+    num.trees = 100,
+    pmm.k = 10
+  )
+
+  # Meses no asalariados ---------------------
+  datos_imp_man <- .datos |>
+    dplyr::select(PB010, PB020, PB030, PY010N, PY050N, PB140, PB150, PE041, man, .f_man) |>
+    dplyr::filter(.f_man %in% c(-1, 1))
+
+  imp_man <- missRanger::missRanger(
+    data = datos_imp_man,
+    formula = man ~ PY010N + PY050N + PB140 + PB150 + PE041,
+    num.trees = 100,
+    pmm.k = 10
+  )
+
+  # Horas habituales semanales ---------------
+  datos_imp_PL060 <- .datos |>
+    dplyr::select(PB010, PB020, PB030, PY010N, PY050N, maa, man, PB140, PB150, PL060, .f_PL060) |>
+    dplyr::filter(.f_PL060 %in% c(-1, 1))
+
+  imp_PL060 <- missRanger::missRanger(
+    data = datos_imp_PL060,
+    formula = PL060 ~ PY010N + PY050N + PB140 + PB150 + maa + man,
+    num.trees = 100,
+    pmm.k = 10
+  )
 
   # Datos finales ------------------------------------------------------------
+  imps <- list(
+    imp_maa = imp_maa |>
+      dplyr::filter(.f_maa == -1) |>
+      dplyr::select(PB010, PB020, PB030, maa),
+    imp_man = imp_man |>
+      dplyr::filter(.f_man == -1) |>
+      dplyr::select(PB010, PB020, PB030, man),
+    imp_PL060 = imp_PL060 |>
+      dplyr::filter(.f_PL060 == -1) |>
+      dplyr::select(PB010, PB020, PB030, PL060)
+  )
+
+  for (.imp in imps) {
+    .datos <- .datos |>
+      dplyr::left_join(
+        .imp, by = dplyr::join_by(PB010, PB020, PB030), suffix = c("", "_imp")
+      )
+  }
+
   .datos <- .datos |>
-    dplyr::left_join(
-      imp_meses,
-      by = dplyr::join_by(PB010, PB020, PB030),
-      suffix = c("", "_imp")
-    ) |>
     dplyr::mutate(
-      .maa = dplyr::case_when(
-        .f_maa == -1 ~ .maa_imp,
-        .default = .maa
+      maa = dplyr::case_when(
+        .f_maa == -1 ~ maa_imp,
+        .default = maa
+      ),
+      man = dplyr::case_when(
+        .f_man == -1 ~ man_imp,
+        .default = man
+      ),
+      PL060 = dplyr::case_when(
+        .f_PL060 == -1 ~ PL060_imp,
+        .default = PL060
       )
     )
 
-  .datos
+  # Devolver -----------------------------------------------------------------
+  attr(.datos, "Imputada") <- TRUE
+
+  return(.datos)
 }

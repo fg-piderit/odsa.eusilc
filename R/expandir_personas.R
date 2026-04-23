@@ -88,7 +88,17 @@ expandir_personas <- function(
 
   if (!bloques["LMH"]) {
     .datos <- dplyr::mutate(.datos, PL130 = NA_integer_, PL230 = NA_integer_)
-    rlang::warn("No se encontro `PL130` o `PL230`. Se pierden: `pl06a`, `pl06b`, `pl07`, `pl09a`, `pl09b`, `py01`, `py02`, `py03`.")
+    rlang::warn("No se encontro `PL130` o `PL230`. Se pierden: `pl06a`, `pl06b`, `pl07`, `pl09a`, `pl09b`, `py13`, `py14`, `py15`.")
+  }
+
+  # Arreglos imputaciones ----------------------------------------------------
+  if (!attr(.datos, "Imputada")) {
+    .datos <- dplyr::mutate(
+      maa = PL073 + PL074,
+      man = PL075 + PL076
+    )
+  } else {
+    rlang::warn("El conjunto de datos fue imputado...")
   }
 
   # Calcular vbles -----------------------------------------------------------
@@ -299,10 +309,10 @@ construir_vbles_p <- function(
       py23 = PY080N,
       py24 = PY090N,
       py25 = PY110N + PY120N + PY130N + PY140N,
-      .haa = (PL073 + PL074) * PL060 * 4.2,
-      .han = (PL075 + PL076) * PL060 * 4.2,
-      py11h = py11 / .haa,
-      py12h = py12 / .han,
+      haa = dplyr::if_else(pl02 == 1 & py11 != 0, maa * PL060 * 4.2, NA_real_),
+      han = dplyr::if_else(pl02 == 1 & py12 != 0, man * PL060 * 4.2, NA_real_),
+      py11h = dplyr::if_else(py11 != 0, py11 / haa, 0),
+      py12h = dplyr::if_else(py12 != 0, py12 / han, 0),
       dplyr::across(py00:py25, \(y) (y * PX010) / 12),
       dplyr::across(py00:py12h, \(y) y / ppa, .names = "{.col}ppa"),
       .keep = "all"

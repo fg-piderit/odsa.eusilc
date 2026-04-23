@@ -4,7 +4,7 @@
 \alias{imputar_personas}
 \title{Title}
 \usage{
-imputar_personas(.datos, .variables, ..., .N_imps = 10)
+imputar_personas(.datos, .variables, ...)
 }
 \arguments{
 \item{.datos}{Conjunto de datos P a imputar.}
@@ -12,8 +12,6 @@ imputar_personas(.datos, .variables, ..., .N_imps = 10)
 \item{.variables}{Grupo de variables a imputar.}
 
 \item{...}{...}
-
-\item{.N_imps}{Cantidad de conjuntos imputados a crear.}
 }
 \value{
 Conjunto de datos P con variables imputadas.
