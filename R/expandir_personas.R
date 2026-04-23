@@ -94,6 +94,7 @@ expandir_personas <- function(
   # Arreglos imputaciones ----------------------------------------------------
   if (!attr(.datos, "Imputada")) {
     .datos <- dplyr::mutate(
+      .datos,
       maa = PL073 + PL074,
       man = PL075 + PL076
     )
@@ -150,51 +151,68 @@ calc_personas <- function(
       pd01b = dplyr::if_else(!is.na(RB081), RB081, PB010 - RB080 - 1),
       pd01c = PB010 - agrupar_nac(PB010, RB080) - 1,
       pd02 = PB150,
-      pd03 = dplyr::case_when(
-        # LOOKUP TABLE?
-        # REVISAR CONSTRUCCION
-        PE041 == 0   ~ 1,
-        PE041 == 100 ~ 2,
-        PE041 == 200 ~ 3,
-        PE041 == 300 ~ 4,
-        PE041 == 340 ~ 4,
-        PE041 == 344 ~ 4,
-        PE041 == 350 ~ 4,
-        PE041 == 353 ~ 4,
-        PE041 == 354 ~ 4,
-        PE041 == 450 ~ 5,
-        PE041 == 500 ~ 6,
-        .default = NA_integer_
+      #pd03 = dplyr::case_when(
+      #  # LOOKUP TABLE?
+      #  # REVISAR CONSTRUCCION
+      #  PE041 == 0   ~ 1,
+      #  PE041 == 100 ~ 2,
+      #  PE041 == 200 ~ 3,
+      #  PE041 == 300 ~ 4,
+      #  PE041 == 340 ~ 4,
+      #  PE041 == 344 ~ 4,
+      #  PE041 == 350 ~ 4,
+      #  PE041 == 353 ~ 4,
+      #  PE041 == 354 ~ 4,
+      #  PE041 == 450 ~ 5,
+      #  PE041 == 500 ~ 6,
+      #  .default = NA_integer_
+      #),
+      pd03 = dplyr::recode_values(
+        PE041, from = tabla_pd03$PE041, to = tabla_pd03$pd03, default = NA_integer_
       ),
       pd04 = dplyr::if_else(RB280 == pi02, 1, 2),
       pd05 = dplyr::if_else(RB290 == pi02, 1, 2),
       # Bloque L -----------------------
       pl01 = NA_integer_,
-      pl02 = dplyr::case_when(
-        # LOOKUP TABLE?
-        PL032 == 1 ~ 1,
-        PL032 == 2 ~ 2,
-        PL032 %in% 3:8 ~ 3,
-        .default = NA_integer_
+      #pl02 = dplyr::case_when(
+      #  # LOOKUP TABLE?
+      #  PL032 == 1 ~ 1,
+      #  PL032 == 2 ~ 2,
+      #  PL032 %in% 3:8 ~ 3,
+      #  .default = NA_integer_
+      #),
+      pl02 = dplyr::recode_values(
+        PL032, from = tabla_pl02$PL032, to = tabla_pl02$pl02, default = NA_integer_
       ),
       pl03a = PL051A,
       pl03b = PL051A %/% 10,
       pl04 = PL040A,
-      pl05 = dplyr::case_when(
-        # LOOKUP TABLE?
-        PL111A == "b - e" ~ 1,
-        PL111A == "f" ~ 2,
-        PL111A == "g" ~ 3,
-        PL111A == "i" ~ 3,
-        PL111A == "h" ~ 4,
-        PL111A == "j" ~ 4,
-        PL111A == "k" ~ 5,
-        PL111A == "l - n" ~ 5,
-        PL111A == "o" ~ 6,
-        PL111A == "p" ~ 7,
-        PL111A == "q" ~ 7,
-        PL111A == "r - u" ~ 9,
-        PL111A == "a" ~ 9,
+      #pl05 = dplyr::case_when(
+      #  # LOOKUP TABLE?
+      #  PL111A == "b - e" ~ 1,
+      #  PL111A == "f" ~ 2,
+      #  PL111A == "g" ~ 3,
+      #  PL111A == "i" ~ 3,
+      #  PL111A == "h" ~ 4,
+      #  PL111A == "j" ~ 4,
+      #  PL111A == "k" ~ 5,
+      #  PL111A == "l - n" ~ 5,
+      #  PL111A == "o" ~ 6,
+      #  PL111A == "p" ~ 7,
+      #  PL111A == "q" ~ 7,
+      #  PL111A == "r - u" ~ 9,
+      #  PL111A == "a" ~ 9,
+      #  .default = NA_integer_
+      #),
+      pl05a = dplyr::recode_values(
+        PL111A, from = tabla_pl05$PL111, to = tabla_pl05$pl05, default = NA_integer_
+      ),
+      pl05b = dplyr::recode_values(
+        PL111B, from = tabla_pl05$PL111, to = tabla_pl05$pl05, default = NA_integer_
+      ),
+      pl05c = dplyr::case_when(
+        PL032 == 1 & PY010N + PY050N != 0 ~ pl05a,
+        PL032 != 1 & PY010N + PY050N != 0 ~ pl05b,
         .default = NA_integer_
       ),
       #pl06a = dplyr::case_when(
@@ -205,28 +223,35 @@ calc_personas <- function(
       #  PL130 > 11 & PL130 <= 13 ~ 4,
       #  .default = NA_integer_
       #),
-      pl06a = calc_testablecimiento(PL130, .lmh),
-      pl06b = dplyr::case_when(
-        # LOOKUP TABLE?
-        PL130 <= 5 ~ 1,
-        PL130 > 5 & PL130 <= 11 ~ 2,
-        PL130 > 11 & PL130 <= 13 ~ 3,
-        .default = NA_integer_
-      ),
+      #pl06b = dplyr::case_when(
+      #  # LOOKUP TABLE?
+      #  PL130 <= 5 ~ 1,
+      #  PL130 > 5 & PL130 <= 11 ~ 2,
+      #  PL130 > 11 & PL130 <= 13 ~ 3,
+      #  .default = NA_integer_
+      #),
+      pl06a = calc_testablecimiento(PL130, "a", .lmh),
+      pl06b = calc_testablecimiento(PL130, "b", .lmh),
       pl07 = dplyr::if_else(PL230 != 99, PL230, NA_integer_),
-      pl08a = dplyr::case_when(
-        # LOOKUP TABLE?
-        PL051A %in% 11:13 | PL051A %/% 10 == 2 | PL051A == 1 ~ 1,
-        PL051A == 14 | PL051A %/% 10 == 3 ~ 2,
-        PL051A %/% 10 %in% 4:8 | PL051A == 2 ~ 3,
-        PL051A %/% 10 == 9 | PL051A == 3 ~ 4,
-        .default = NA_integer_
+      #pl08a = dplyr::case_when(
+      #  # LOOKUP TABLE?
+      #  PL051A %in% 11:13 | PL051A %/% 10 == 2 | PL051A == 1 ~ 1,
+      #  PL051A == 14 | PL051A %/% 10 == 3 ~ 2,
+      #  PL051A %/% 10 %in% 4:8 | PL051A == 2 ~ 3,
+      #  PL051A %/% 10 == 9 | PL051A == 3 ~ 4,
+      #  .default = NA_integer_
+      #),
+      #pl08b = dplyr::case_when(
+      #  # LOOKUP TABLE?
+      #  PL051A == 2 | (PL051A >= 20 & PL051A <= 35) ~ 1,
+      #  !is.na(PL051A) ~ 2,
+      #  .default = NA_integer_
+      #),
+      pl08a = dplyr::recode_values(
+        PL051A, from = tabla_isco$PL051, to = tabla_isco$pl08a, default = NA_integer_
       ),
-      pl08b = dplyr::case_when(
-        # LOOKUP TABLE?
-        PL051A == 2 | (PL051A >= 20 & PL051A <= 35) ~ 1,
-        !is.na(PL051A) ~ 2,
-        .default = NA_integer_
+      pl08b = dplyr::recode_values(
+        PL051B, from = tabla_isco$PL051, to = tabla_isco$pl08b, default = NA_integer_
       ),
       pl09a = dplyr::case_when(
         PL040A == 1 & pl06b > 1 ~ 1,
@@ -238,7 +263,7 @@ calc_personas <- function(
         PL040A == 2 & pl08b == 2 ~ 7,
         PL040A == 3 & pl07 == 2 & pl06b == 1 ~ 8,
         PL040A == 4 ~ 8,
-        pl02 == 1 & pl05 == 8 ~ 9,
+        pl02 == 1 & pl05a == 8 ~ 9,
         .default = NA_integer_
       ),
       pl09b = dplyr::case_when(

@@ -4,10 +4,12 @@
 \alias{calc_testablecimiento}
 \title{Title}
 \usage{
-calc_testablecimiento(.PL130, .lmh = TRUE)
+calc_testablecimiento(.PL130, .nivel, .lmh = TRUE)
 }
 \arguments{
 \item{.PL130}{PL130}
+
+\item{.nivel}{Nivel de agregación.}
 
 \item{.lmh}{Módulo LMH}
 }

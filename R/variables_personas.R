@@ -21,22 +21,26 @@ agrupar_nac <- function(.anio, .nac) {
 #' Title
 #'
 #' @param .PL130 PL130
+#' @param .nivel Nivel de agregación.
 #' @param .lmh Módulo LMH
 #'
 #' @returns Tamaño del establecimiento
-calc_testablecimiento <- function(.PL130, .lmh = TRUE) {
-  if (.lmh) {
-    dplyr::case_when(
-      # LOOKUP TABLE?
-      .PL130 <= 5 ~ 1,
-      .PL130 > 5 & .PL130 <= 9 ~ 2,
-      .PL130 > 9 & .PL130 <= 11 ~ 3,
-      .PL130 > 11 & .PL130 <= 13 ~ 4,
-      .default = NA_integer_
+calc_testablecimiento <- function(.PL130, .nivel, .lmh = TRUE) {
+  rlang::arg_match(.nivel, c("a", "b"))
+
+  if (!.lmh) {
+    pl06 <- NA_integer_
+  } else if (.nivel == "a") {
+    pl06 <- dplyr::recode_values(
+      .PL130, from = tabla_pl06$PL130, to = tabla_pl06$pl06a, default = NA_integer_
     )
   } else {
-    NA_integer_
+    pl06 <- dplyr::recode_values(
+      .PL130, from = tabla_pl06$PL130, to = tabla_pl06$pl06b, default = NA_integer_
+    )
   }
+
+  return(pl06)
 }
 
 #' Title
@@ -44,11 +48,39 @@ calc_testablecimiento <- function(.PL130, .lmh = TRUE) {
 #' @param .PL040A PL040A
 #' @param .pl06b pl06b
 #' @param .pl08b pl08b
+#' @param .nivel Nivel de agregación.
 #' @param .lmh lmh
 #'
 #' @returns heterogeneidad
-calc_heterogeneidad <- function(.PL040A, .pl06b, .pl08b, .lmh = TRUE) {
+calc_heterogeneidad <- function(.PL040A, .pl06b, .pl08b, .nivel, .lmh = TRUE) {
+  rlang::arg_match(.nivel, c("a", "b"))
 
+  if (!.lmh) {
+    pl09 <- NA_integer_
+  } else if (.nivel == "a") {
+    pl09 <- dplyr::case_when(
+      PL040A == 1 & pl06b > 1 ~ 1,
+      PL040A == 2 & pl08b == 1 ~ 2,
+      pl02 == 1 & pl07 == 1 ~ 3,
+      PL040A == 3 & pl07 == 2 & pl06b == 3 ~ 4,
+      PL040A == 3 & pl07 == 2 & pl06b == 2 ~ 5,
+      PL040A == 1 & pl06b == 1 ~ 6,
+      PL040A == 2 & pl08b == 2 ~ 7,
+      PL040A == 3 & pl07 == 2 & pl06b == 1 ~ 8,
+      PL040A == 4 ~ 8,
+      pl02 == 1 & pl05 == 8 ~ 9,
+      .default = NA_integer_
+    )
+  } else {
+    pl09 <- dplyr::case_when(
+      pl09a == 3 ~ 1,
+      pl09a %in% c(1, 2, 4, 5, 9) ~ 2,
+      pl09a %in% c(7, 8) ~ 3,
+      .default = NA_integer_
+    )
+  }
+
+  return(pl09)
 }
 
 #' Title
