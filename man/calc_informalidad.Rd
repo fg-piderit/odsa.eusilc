@@ -4,7 +4,7 @@
 \alias{calc_informalidad}
 \title{Title}
 \usage{
-calc_informalidad(.PL040A, .PY030G, .PY035G)
+calc_informalidad(.PL040A, .PY030G, .PY035G, .nivel)
 }
 \arguments{
 \item{.PL040A}{PL040A}
@@ -12,6 +12,8 @@ calc_informalidad(.PL040A, .PY030G, .PY035G)
 \item{.PY030G}{PY030G}
 
 \item{.PY035G}{PY035G}
+
+\item{.nivel}{nivel de agregación}
 }
 \value{
 informalidad

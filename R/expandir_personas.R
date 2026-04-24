@@ -92,7 +92,7 @@ expandir_personas <- function(
   }
 
   # Arreglos imputaciones ----------------------------------------------------
-  if (!attr(.datos, "Imputada")) {
+  if (is.null(attr(.datos, "Imputada"))) {
     .datos <- dplyr::mutate(
       .datos,
       maa = PL073 + PL074,
@@ -150,192 +150,55 @@ calc_personas <- function(
       pd01a = RB082,
       pd01b = dplyr::if_else(!is.na(RB081), RB081, PB010 - RB080 - 1),
       pd01c = PB010 - agrupar_nac(PB010, RB080) - 1,
-      pd02 = PB150,
-      #pd03 = dplyr::case_when(
-      #  # LOOKUP TABLE?
-      #  # REVISAR CONSTRUCCION
-      #  PE041 == 0   ~ 1,
-      #  PE041 == 100 ~ 2,
-      #  PE041 == 200 ~ 3,
-      #  PE041 == 300 ~ 4,
-      #  PE041 == 340 ~ 4,
-      #  PE041 == 344 ~ 4,
-      #  PE041 == 350 ~ 4,
-      #  PE041 == 353 ~ 4,
-      #  PE041 == 354 ~ 4,
-      #  PE041 == 450 ~ 5,
-      #  PE041 == 500 ~ 6,
-      #  .default = NA_integer_
-      #),
-      pd03 = dplyr::recode_values(
-        PE041, from = tabla_pd03$PE041, to = tabla_pd03$pd03, default = NA_integer_
-      ),
-      pd04 = dplyr::if_else(RB280 == pi02, 1, 2),
-      pd05 = dplyr::if_else(RB290 == pi02, 1, 2),
+      pd02  = PB150,
+      pd03  = dplyr::recode_values(PE041, from = tabla_pd03$PE041,
+                                   to = tabla_pd03$pd03, default = NA_integer_),
+      pd04  = dplyr::if_else(RB280 == pi02, 1, 2),
+      pd05  = dplyr::if_else(RB290 == pi02, 1, 2),
       # Bloque L -----------------------
-      pl01 = NA_integer_,
-      #pl02 = dplyr::case_when(
-      #  # LOOKUP TABLE?
-      #  PL032 == 1 ~ 1,
-      #  PL032 == 2 ~ 2,
-      #  PL032 %in% 3:8 ~ 3,
-      #  .default = NA_integer_
-      #),
-      pl02 = dplyr::recode_values(
-        PL032, from = tabla_pl02$PL032, to = tabla_pl02$pl02, default = NA_integer_
-      ),
+      pl01  = NA_integer_,
+      pl02  = dplyr::recode_values(PL032, from = tabla_pl02$PL032,
+                                   to = tabla_pl02$pl02, default = NA_integer_),
       pl03a = PL051A,
       pl03b = PL051A %/% 10,
-      pl04 = PL040A,
-      #pl05 = dplyr::case_when(
-      #  # LOOKUP TABLE?
-      #  PL111A == "b - e" ~ 1,
-      #  PL111A == "f" ~ 2,
-      #  PL111A == "g" ~ 3,
-      #  PL111A == "i" ~ 3,
-      #  PL111A == "h" ~ 4,
-      #  PL111A == "j" ~ 4,
-      #  PL111A == "k" ~ 5,
-      #  PL111A == "l - n" ~ 5,
-      #  PL111A == "o" ~ 6,
-      #  PL111A == "p" ~ 7,
-      #  PL111A == "q" ~ 7,
-      #  PL111A == "r - u" ~ 9,
-      #  PL111A == "a" ~ 9,
-      #  .default = NA_integer_
-      #),
-      pl05a = dplyr::recode_values(
-        PL111A, from = tabla_pl05$PL111, to = tabla_pl05$pl05, default = NA_integer_
-      ),
-      pl05b = dplyr::recode_values(
-        PL111B, from = tabla_pl05$PL111, to = tabla_pl05$pl05, default = NA_integer_
-      ),
+      pl04  = PL040A,
+      pl05a = dplyr::recode_values(PL111A, from = tabla_pl05$PL111,
+                                   to = tabla_pl05$pl05, default = NA_integer_),
+      pl05b = dplyr::recode_values(PL111B, from = tabla_pl05$PL111,
+                                   to = tabla_pl05$pl05, default = NA_integer_),
       pl05c = dplyr::case_when(
         PL032 == 1 & PY010N + PY050N != 0 ~ pl05a,
         PL032 != 1 & PY010N + PY050N != 0 ~ pl05b,
         .default = NA_integer_
       ),
-      #pl06a = dplyr::case_when(
-      #  # LOOKUP TABLE?
-      #  PL130 <= 5 ~ 1,
-      #  PL130 > 5 & PL130 <= 9 ~ 2,
-      #  PL130 > 9 & PL130 <= 11 ~ 3,
-      #  PL130 > 11 & PL130 <= 13 ~ 4,
-      #  .default = NA_integer_
-      #),
-      #pl06b = dplyr::case_when(
-      #  # LOOKUP TABLE?
-      #  PL130 <= 5 ~ 1,
-      #  PL130 > 5 & PL130 <= 11 ~ 2,
-      #  PL130 > 11 & PL130 <= 13 ~ 3,
-      #  .default = NA_integer_
-      #),
       pl06a = calc_testablecimiento(PL130, "a", .lmh),
       pl06b = calc_testablecimiento(PL130, "b", .lmh),
-      pl07 = dplyr::if_else(PL230 != 99, PL230, NA_integer_),
-      #pl08a = dplyr::case_when(
-      #  # LOOKUP TABLE?
-      #  PL051A %in% 11:13 | PL051A %/% 10 == 2 | PL051A == 1 ~ 1,
-      #  PL051A == 14 | PL051A %/% 10 == 3 ~ 2,
-      #  PL051A %/% 10 %in% 4:8 | PL051A == 2 ~ 3,
-      #  PL051A %/% 10 == 9 | PL051A == 3 ~ 4,
-      #  .default = NA_integer_
-      #),
-      #pl08b = dplyr::case_when(
-      #  # LOOKUP TABLE?
-      #  PL051A == 2 | (PL051A >= 20 & PL051A <= 35) ~ 1,
-      #  !is.na(PL051A) ~ 2,
-      #  .default = NA_integer_
-      #),
-      pl08a = dplyr::recode_values(
-        PL051A, from = tabla_isco$PL051, to = tabla_isco$pl08a, default = NA_integer_
-      ),
-      pl08b = dplyr::recode_values(
-        PL051B, from = tabla_isco$PL051, to = tabla_isco$pl08b, default = NA_integer_
-      ),
-      pl09a = dplyr::case_when(
-        PL040A == 1 & pl06b > 1 ~ 1,
-        PL040A == 2 & pl08b == 1 ~ 2,
-        pl02 == 1 & pl07 == 1 ~ 3,
-        PL040A == 3 & pl07 == 2 & pl06b == 3 ~ 4,
-        PL040A == 3 & pl07 == 2 & pl06b == 2 ~ 5,
-        PL040A == 1 & pl06b == 1 ~ 6,
-        PL040A == 2 & pl08b == 2 ~ 7,
-        PL040A == 3 & pl07 == 2 & pl06b == 1 ~ 8,
-        PL040A == 4 ~ 8,
-        pl02 == 1 & pl05a == 8 ~ 9,
-        .default = NA_integer_
-      ),
-      pl09b = dplyr::case_when(
-        pl09a == 3 ~ 1,
-        pl09a %in% c(1, 2, 4, 5, 9) ~ 2,
-        pl09a %in% c(7, 8) ~ 3,
-        .default = NA_integer_
-      ),
-      .pl10 = dplyr::case_when(
-        # LOOKUP TABLE?
-        PL051A %in% c(1, 11:26) ~ 1,
-        PL051A %in% c(2, 31:35) ~ 3,
-        PL051A %in% c(3, 41:44) ~ 4,
-        PL051A %in%   51:54 ~ 5,
-        PL051A %in% c(61, 62, 92) ~ 10,
-        PL051A %in%   71:83 ~ 8,
-        PL051A %in% c(91, 93:96) ~ 9,
-        .default = NA_integer_
-      ),
-      pl10 = dplyr::case_when(
-        .pl10 == 8 & PL040A != 1 ~ 8,
-        .pl10 > 1 & PL040A == 1 ~ 2,
-        .pl10 > 1 & PL040A == 2 ~ 6,
-        .pl10 > 1 & is.na(PL040A) ~ NA_integer_,
-        .pl10 > 2 & PL150 == 1 ~ 7,
-        .pl10 > 2 & is.na(PL150) ~ NA_integer_,
-        .default = .pl10
-      ),
-      pl11a = dplyr::case_when(
-        PL040A == 3 & PY030G != 0 ~ 1,
-        PL040A == 3 & PY030G == 0 ~ 2,
-        PL040A %in% 1:2 & !(PY030G == 0 & PY035G == 0) ~ 3,
-        PL040A %in% 1:2 & PY030G == 0 & PY035G == 0 ~ 4,
-        PL040A == 4 ~ 4,
-        .default = NA_integer_
-      ),
-      pl11b = dplyr::case_when(
-        pl11a %in% c(1, 3) ~ 1,
-        pl11a %in% c(2, 4) ~ 2,
-        .default = NA_integer_
-      ),
+      pl07  = dplyr::if_else(PL230 != 99, PL230, NA_integer_),
+      pl08a = dplyr::recode_values(PL051A, from = tabla_isco$PL051,
+                                   to = tabla_isco$pl08a, default = NA_integer_),
+      pl08b = dplyr::recode_values(PL051B, from = tabla_isco$PL051,
+                                   to = tabla_isco$pl08b, default = NA_integer_),
+      pl09a = calc_heterogeneidad(PL040A, PL032, pl05a, pl06b, pl07, pl08b, "a", .lmh),
+      pl09b = calc_heterogeneidad(PL040A, PL032, pl05a, pl06b, pl07, pl08b, "b", .lmh),
+      pl10  = calc_egp(PL051A, PL040A, PL150),
+      pl11a = calc_informalidad(PL040A, PY030G, PY035G, "a"),
+      pl11b = calc_informalidad(PL040A, PY030G, PY035G, "b"),
       # Bloque Y -----------------------
       py00 = PY010N + PY050N + PY090N + PY110N + PY120N + PY130N + PY140N + PY100N + PY080N,
       py10 = PY010N + PY050N,
       py11 = PY010N,
       py12 = PY050N,
-      py13 = dplyr::case_when(
-        # REVISAR CONSTRUCCION
-        py10 != 0 & is.na(pl09b) ~ NA_real_,
-        py10 != 0 & pl09b == 1 ~ py10,
-        .default = 0
-      ),
-      py14 = dplyr::case_when(
-        # REVISAR CONSTRUCCION
-        py10 != 0 & is.na(pl09b) ~ NA_real_,
-        py10 != 0 & pl09b == 2 ~ py10,
-        .default = 0
-      ),
-      py15 = dplyr::case_when(
-        # REVISAR CONSTRUCCIÓN
-        py10 != 0 & is.na(pl09b) ~ NA_real_,
-        py10 != 0 & pl09b == 3 ~ py10,
-        .default = 0
-      ),
+      py13 = calc_y_sector(py10, pl09b, 1, .lmh),
+      py14 = calc_y_sector(py10, pl09b, 2, .lmh),
+      py15 = calc_y_sector(py10, pl09b, 3, .lmh),
       py20 = PY090N + PY110N + PY120N + PY130N + PY140N + PY100N + PY080N,
       py21 = PY100N + PY080N,
       py22 = PY100N,
       py23 = PY080N,
       py24 = PY090N,
       py25 = PY110N + PY120N + PY130N + PY140N,
-      haa = dplyr::if_else(pl02 == 1 & py11 != 0, maa * PL060 * 4.2, NA_real_),
-      han = dplyr::if_else(pl02 == 1 & py12 != 0, man * PL060 * 4.2, NA_real_),
+      haa  = dplyr::if_else(pl02 == 1 & py11 != 0, maa * PL060 * 4.2, NA_real_),
+      han  = dplyr::if_else(pl02 == 1 & py12 != 0, man * PL060 * 4.2, NA_real_),
       py11h = dplyr::if_else(py11 != 0, py11 / haa, 0),
       py12h = dplyr::if_else(py12 != 0, py12 / han, 0),
       dplyr::across(py00:py25, \(y) (y * PX010) / 12),

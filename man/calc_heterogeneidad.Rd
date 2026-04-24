@@ -4,12 +4,27 @@
 \alias{calc_heterogeneidad}
 \title{Title}
 \usage{
-calc_heterogeneidad(.PL040A, .pl06b, .pl08b, .nivel, .lmh = TRUE)
+calc_heterogeneidad(
+  .PL040A,
+  .PL032,
+  .pl05,
+  .pl06b,
+  .pl07,
+  .pl08b,
+  .nivel,
+  .lmh = TRUE
+)
 }
 \arguments{
 \item{.PL040A}{PL040A}
 
+\item{.PL032}{PL032}
+
+\item{.pl05}{pl05}
+
 \item{.pl06b}{pl06b}
+
+\item{.pl07}{pl07}
 
 \item{.pl08b}{pl08b}
 

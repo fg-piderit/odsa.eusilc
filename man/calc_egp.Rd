@@ -4,7 +4,7 @@
 \alias{calc_egp}
 \title{Title}
 \usage{
-calc_egp(.PL051A, .PL040A, .PL150, .lmh = TRUE)
+calc_egp(.PL051A, .PL040A, .PL150)
 }
 \arguments{
 \item{.PL051A}{PL051A}
@@ -12,8 +12,6 @@ calc_egp(.PL051A, .PL040A, .PL150, .lmh = TRUE)
 \item{.PL040A}{PL040A}
 
 \item{.PL150}{PL150}
-
-\item{.lmh}{lmh}
 }
 \value{
 egp
