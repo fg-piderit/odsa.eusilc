@@ -14,8 +14,6 @@
 #' Europea 27 países y finalmente `ppa_factor_us` para convertirlos a unidades
 #' de PPA en dólares estadounidenses.
 #' 
-#' \out{a + b}
-#'
 #' @format tabla_ppa
 #' A tibble: 56 x 3
 #' \describe{

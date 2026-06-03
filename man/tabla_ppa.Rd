@@ -33,7 +33,5 @@ to national currency}) para convertir los montos a moneda nacional,
 \code{ppa_factor} para convertirlos a unidades de PPA en euros de la Unión
 Europea 27 países y finalmente \code{ppa_factor_us} para convertirlos a unidades
 de PPA en dólares estadounidenses.
-
-\out{a + b}
 }
 \keyword{datasets}
