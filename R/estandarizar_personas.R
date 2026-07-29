@@ -131,7 +131,7 @@ estandarizar_personas <- function(
 #' @returns `tibble`. Conjunto de datos P estandarizado para [imputar_personas()] y [calcular_personas()].
 estandarizar_personas_ <- function(.P, .R, .D, .anio, .pais) {
   # Anterior a 2021 --------------------------
-  if (.anio <= 2021) {
+  if (.anio < 2021) {
     .P <- dplyr::mutate(
       .P,
       RB080 = PB140,
@@ -190,7 +190,7 @@ estandarizar_personas_ <- function(.P, .R, .D, .anio, .pais) {
     )
 
     cli::cli_bullets(c(
-      "v" = "La base es posterior a 2021 y se proporciono el conjunto R"
+      "v" = "La base corresponde al anio 2021 o posterior, y se proporciono el conjunto R"
     ))
   }
 
