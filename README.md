@@ -48,13 +48,13 @@ library(pak)
 ```
 ## Versión _release_ o estable
 
-La versión estable se instala a partir del archivo `odsa.eusilc_0.1.0.tar.gz`,
+La versión estable se instala a partir del archivo `odsa.eusilc_0.1.1.tar.gz`,
 descargable desde la sección de _releases_, con la función `pak::pkg_install`,
 indicando la fuente `local`:
 
 ``` r
 # La ruta es relativa al working directory, que se ve con getwd()
-pak::pkg_install("local::/ruta/al/archivo/odsa.eusilc_0.1.0.tar.gz")
+pak::pkg_install("local::/ruta/al/archivo/odsa.eusilc_0.1.1.tar.gz")
 ```
 
 ## Versión de desarrollo
@@ -244,7 +244,7 @@ desarrollo activo. Por el momento, la cita recomendada es:
 
 ```
 # Cita formateada
-Piderit, F. (2026). {odsa.eusilc}: Funciones para trabajar con los datos de la encuesta EU-SILC (Versión 0.1.0). Observatorio de la Deuda Social Argentina. https://github.com/odsa-uca/odsa.eusilc.git
+Piderit, F. (2026). {odsa.eusilc}: Funciones para trabajar con los datos de la encuesta EU-SILC (Versión 0.1.1). Observatorio de la Deuda Social Argentina. https://github.com/odsa-uca/odsa.eusilc.git
 
 # En formato bibtex
 @software{piderit_2026_odsaeusilc,
@@ -255,6 +255,6 @@ Piderit, F. (2026). {odsa.eusilc}: Funciones para trabajar con los datos de la e
   location = {Buenos Aires},
   url = {https://github.com/odsa-uca/odsa.eusilc.git},
   organization = {Observatorio de la Deuda Social Argentina},
-  version = {0.1.0}
+  version = {0.1.1}
 }
 ```
