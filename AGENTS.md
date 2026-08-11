@@ -88,3 +88,4 @@ En cuanto a la planificación, me gustaría que:
 - Guardes el prompt que te di y el plan final ejecutado en un archivo markdown
   en la carpeta `\.agents\planes`. El nombre del archivo debe tener un
   timestamp con formato "YYYY-MM-DD_hh-mm-ss" seguido de una breve descripción.
+- Si te pido que guardes una sugerencia, hazlo en `\.agents\sugerencias` con el nombre `YYYY-MM-DD_hh-mm-ss_descripcion_breve.md`.
