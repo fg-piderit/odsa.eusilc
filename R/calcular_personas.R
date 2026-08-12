@@ -85,7 +85,7 @@
 #'
 #' Nota 2: Puede tener valores negativos!
 #' Nota 3: Dependen de las variables PL130 y PL230 del módulo LMH
-#' 
+#'
 #' Las variables de ingreso se presentan en la moneda nacional del país
 #' correspondiente mensualizados (sin sufijo) y en dólares paridad de poder
 #' adquisitivo (sufijo `ppa`). Para más detalles ver [tabla_ppa].
@@ -110,9 +110,7 @@
 calcular_personas <- function(.P, .expandir = FALSE) {
   if (!is.data.frame(.P)) {
     cli::cli_abort(
-      c(".P debe ser un data.frame o tibble.",
-        "x" = "Se paso un {class(.P)}"
-      ),
+      c(".P debe ser un data.frame o tibble.", "x" = "Se paso un {class(.P)}"),
       class = "no_data_frame"
     )
   }
@@ -128,30 +126,31 @@ calcular_personas <- function(.P, .expandir = FALSE) {
       class = "no_p"
     )
   }
-  
+
   if (!is.logical(.expandir)) {
     cli::cli_abort(
-      c(".expandir debe ser TRUE o FALSE.",
+      c(
+        ".expandir debe ser TRUE o FALSE.",
         "x" = "Se paso un {class(.expandir)}"
       ),
       class = "no_logical"
     )
   }
-  
+
   # --------------------------------------------------------------------------
   cli::cli_h1("Calcular variables nuevas")
   .P <- calcular_personas_(.P)
-  
+
   chequear_perdidas(.P, "P")
-  
+
   if (!.expandir) {
     .P <- dplyr::select(.P, dplyr::any_of(names(etq$P$variables)))
   } else {
     .P <- dplyr::relocate(.P, dplyr::any_of(names(etq$P$variables)))
   }
-  
+
   attr(.P, "expandida") <- .expandir
-  
+
   return(.P)
 }
 
@@ -164,7 +163,7 @@ calcular_personas <- function(.P, .expandir = FALSE) {
 #' bloques: I de identificación, D de demográficos, L de laborales e Y de
 #' ingresos. Dependiendo del año, el país de la encuesta y si se proporcionaron
 #' los conjuntos D y R algunas de las variables pueden estar perdidas (`NA`).
-#' 
+#'
 #' @details
 #' Esta función es el núcleo interno de [calcular_personas()]. Para más detalles
 #' ver la documentación de esa función.
@@ -175,60 +174,60 @@ calcular_personas <- function(.P, .expandir = FALSE) {
 calcular_personas_ <- function(.P) {
   # PPA --------------------------------------
   .P <- dplyr::left_join(
-    x  = .P,
-    y  = tabla_ppa,
+    x = .P,
+    y = tabla_ppa,
     by = dplyr::join_by(PB010, PB020)
   )
 
   # Lookup -----------------------------------
   .P <- dplyr::mutate(
     .P,
-    pd03  = dplyr::recode_values(
+    pd03 = dplyr::recode_values(
       PE041,
       from = tabla_pd03$PE041,
-      to   = tabla_pd03$pd03,
+      to = tabla_pd03$pd03,
       default = NA_integer_
     ),
-    pl01  = dplyr::recode_values(
+    pl01 = dplyr::recode_values(
       PL032,
       from = tabla_pl01$PL032,
-      to   = tabla_pl01$pl01,
+      to = tabla_pl01$pl01,
       default = NA_integer_
     ),
     pl12a = dplyr::recode_values(
       PL051A,
       from = tabla_isco$PL051,
-      to   = tabla_isco$pl12,
+      to = tabla_isco$pl12,
       default = NA_integer_
     ),
     pl12b = dplyr::recode_values(
       PL051B,
       from = tabla_isco$PL051,
-      to   = tabla_isco$pl12,
+      to = tabla_isco$pl12,
       default = NA_integer_
     ),
     pl13a = dplyr::recode_values(
       PL051A,
       from = tabla_isco$PL051,
-      to   = tabla_isco$pl13,
+      to = tabla_isco$pl13,
       default = NA_integer_
     ),
     pl13b = dplyr::recode_values(
       PL051B,
       from = tabla_isco$PL051,
-      to   = tabla_isco$pl13,
+      to = tabla_isco$pl13,
       default = NA_integer_
     ),
     pl20a = dplyr::recode_values(
       PL111A,
       from = tabla_pl20$PL111,
-      to   = tabla_pl20$pl20,
+      to = tabla_pl20$pl20,
       default = NA_integer_
     ),
     pl20b = dplyr::recode_values(
       PL111B,
       from = tabla_pl20$PL111,
-      to   = tabla_pl20$pl20,
+      to = tabla_pl20$pl20,
       default = NA_integer_
     ),
   )
@@ -247,10 +246,10 @@ calcular_personas_ <- function(.P) {
     pd01a = RB082,
     pd01b = dplyr::if_else(!is.na(RB081), RB081, PB010 - RB080 - 1),
     pd01c = PB010 - agrupar_nac(PB010, RB080) - 1,
-    pd02  = PB150,
-    pd04  = dplyr::if_else(RB280 == "LOC", 1, 2),
-    pd05  = dplyr::if_else(RB290 == "LOC", 1, 2),
-    pd06  = NA_integer_,
+    pd02 = PB150,
+    pd04 = dplyr::if_else(RB280 == "LOC", 1, 2),
+    pd05 = dplyr::if_else(RB290 == "LOC", 1, 2),
+    pd06 = NA_integer_,
     # Bloque L -----------------------
     pl02a = PL040A,
     pl02b = PL040B,
@@ -267,8 +266,17 @@ calcular_personas_ <- function(.P) {
     pl50  = calc_egp(PL051A, PL040A, PL150),
     pl40a = calc_informalidad(PL040A, PY030G, PY035G, "a"),
     pl40b = calc_informalidad(PL040A, PY030G, PY035G, "b"),
+    pl41  = calc_calidad(pl40a, pl12a, pomj),
     # Bloque Y -----------------------
-    py00 = PY010N + PY050N + PY090N + PY110N + PY120N + PY130N + PY140N + PY100N + PY080N,
+    py00 = PY010N +
+      PY050N +
+      PY090N +
+      PY110N +
+      PY120N +
+      PY130N +
+      PY140N +
+      PY100N +
+      PY080N,
     py10 = PY010N + PY050N,
     py11 = PY010N,
     py12 = PY050N,
@@ -278,10 +286,16 @@ calcular_personas_ <- function(.P) {
     py23 = PY080N,
     py24 = PY090N,
     py25 = PY110N + PY120N + PY130N + PY140N,
-    haa  = dplyr::if_else(pl01 == 1 & py11 != 0 & maa != 0,
-                          maa * PL060 * 4.2, NA_real_),
-    han  = dplyr::if_else(pl01 == 1 & py12 != 0 & man != 0,
-                          man * PL060 * 4.2, NA_real_),
+    haa = dplyr::if_else(
+      pl01 == 1 & py11 != 0 & maa != 0,
+      maa * PL060 * 4.2,
+      NA_real_
+    ),
+    han = dplyr::if_else(
+      pl01 == 1 & py12 != 0 & man != 0,
+      man * PL060 * 4.2,
+      NA_real_
+    ),
     py11h = dplyr::if_else(py11 != 0, (py11 * PX010) / haa, 0),
     py12h = dplyr::if_else(py12 != 0, (py12 * PX010) / han, 0),
     .keep = "all"
@@ -293,33 +307,32 @@ calcular_personas_ <- function(.P) {
       pl21a = dplyr::recode_values(
         PL130,
         from = tabla_pl21$PL130,
-        to   = tabla_pl21$pl21a,
+        to = tabla_pl21$pl21a,
         default = NA_integer_
       ),
       pl21b = dplyr::recode_values(
         PL130,
         from = tabla_pl21$PL130,
-        to   = tabla_pl21$pl21b,
+        to = tabla_pl21$pl21b,
         default = NA_integer_
       ),
-     .keep = "all"
+      .keep = "all"
     )
   } else {
     .P <- dplyr::mutate(
       .data = .P,
       pl21a = NA_integer_,
       pl21b = NA_integer_,
-      pl30  = NA_integer_,
-      pl31  = NA_integer_,
-      py13  = NA_real_,
-      py14  = NA_real_,
-      py15  = NA_real_,
-     .keep  = "all"
+      pl30 = NA_integer_,
+      pl31 = NA_integer_,
+      py13 = NA_real_,
+      py14 = NA_real_,
+      py15 = NA_real_,
+      .keep = "all"
     )
-
   }
 
-  if("PL230" %in% names(.P)) {
+  if ("PL230" %in% names(.P)) {
     .P <- dplyr::mutate(
       .data = .P,
       pl22 = dplyr::if_else(PL230 != 99, PL230, NA_integer_)
@@ -327,17 +340,17 @@ calcular_personas_ <- function(.P) {
   } else {
     .P <- dplyr::mutate(
       .data = .P,
-      pl22  = NA_integer_,
-      pl30  = NA_integer_,
-      pl31  = NA_integer_,
-      py13  = NA_real_,
-      py14  = NA_real_,
-      py15  = NA_real_,
-     .keep  = "all"
+      pl22 = NA_integer_,
+      pl30 = NA_integer_,
+      pl31 = NA_integer_,
+      py13 = NA_real_,
+      py14 = NA_real_,
+      py15 = NA_real_,
+      .keep = "all"
     )
   }
 
-  if(all(c("PL130", "PL230") %in% names(.P))) {
+  if (all(c("PL130", "PL230") %in% names(.P))) {
     .P <- dplyr::mutate(
       .data = .P,
       pl30 = calc_heterogeneidad(PL040A, PL032, pl20a, pl21b, pl22, pl13a, "a"),
@@ -345,7 +358,7 @@ calcular_personas_ <- function(.P) {
       py13 = calc_y_sector(py10, pl31, 1),
       py14 = calc_y_sector(py10, pl31, 2),
       py15 = calc_y_sector(py10, pl31, 3),
-     .keep = "all"
+      .keep = "all"
     )
   }
 
@@ -391,7 +404,7 @@ agrupar_nac <- function(.anio, .nac) {
 
 # ============================================================================
 #' Calcula el clasificador de heterogeneidad estructural
-#' 
+#'
 #' @param .PL040A `numeric`. Categoría ocupacional
 #' @param .PL032 `numeric`. Condición de actividad
 #' @param .pl20  `numeric`. Rama de actividad
@@ -401,7 +414,15 @@ agrupar_nac <- function(.anio, .nac) {
 #' @param .nivel `numeric`. Nivel de agregación
 #'
 #' @returns `numeric`. Clasificador de heterogeneidad estructural
-calc_heterogeneidad <- function(.PL040A, .PL032, .pl20, .pl21b, .pl22, .pl13, .nivel) {
+calc_heterogeneidad <- function(
+  .PL040A,
+  .PL032,
+  .pl20,
+  .pl21b,
+  .pl22,
+  .pl13,
+  .nivel
+) {
   if (.nivel == "a") {
     pl3x <- dplyr::case_when(
       .PL040A == 1 & .pl21b > 1 ~ 1,
@@ -444,9 +465,12 @@ calc_heterogeneidad <- function(.PL040A, .PL032, .pl20, .pl21b, .pl22, .pl13, .n
 #' @returns `numeric`. Clasificador de clase de EGP
 calc_egp <- function(.PL051A, .PL040A, .PL150) {
   .pl50 <- dplyr::recode_values(
-    .PL051A, from = tabla_isco$PL051, to = tabla_isco$.pl50, default = NA_integer_
+    .PL051A,
+    from = tabla_isco$PL051,
+    to = tabla_isco$.pl50,
+    default = NA_integer_
   )
-  pl50 <-  dplyr::case_when(
+  pl50 <- dplyr::case_when(
     .pl50 == 8 & .PL040A != 1 ~ 8,
     .pl50 > 1 & .PL040A == 1 ~ 2,
     .pl50 > 1 & .PL040A == 2 ~ 6,
@@ -460,7 +484,7 @@ calc_egp <- function(.PL051A, .PL040A, .PL150) {
 }
 
 # ============================================================================
-#' Clacula el clasificador de informalidad laboral según aportes a la seguridad social
+#' Calcula el clasificador de informalidad laboral según aportes a la seguridad social
 #'
 #' @param .PL040A `numeric`. Categoría ocupacional
 #' @param .PY030G `numeric`. Contribuciones a la seguridad social del empleador
@@ -490,6 +514,21 @@ calc_informalidad <- function(.PL040A, .PY030G, .PY035G, .nivel) {
   }
 
   return(pl40)
+}
+
+# ============================================================================
+calc_calidad <- function(.pl40a, .pl12a, .pomj) {
+  pl41 <- case_when(
+    .pl40a == 3 & .pl12a == 1 ~ 1,
+    .pl40a == 3 & .pl12a != 1 ~ 2,
+    .pl40a == 1 & .pomj == 1 ~ 3,
+    .pl40a == 1 & .pomj == 2 ~ 4,
+    .pl40a == 4 ~ 5,
+    .pl40a == 2 ~ 6,
+    .default = NA_integer_
+  )
+
+  return(pl41)
 }
 
 # ============================================================================

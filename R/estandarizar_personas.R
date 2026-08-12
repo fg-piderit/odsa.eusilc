@@ -66,18 +66,16 @@
 #'
 #' @export
 estandarizar_personas <- function(
-    .P,
-    .D = NULL,
-    .R = NULL,
-    .flags = FALSE
+  .P,
+  .D = NULL,
+  .R = NULL,
+  .flags = FALSE
 ) {
   chequear_bases_personas(.P, .D, .R)
-  
+
   if (!is.logical(.flags)) {
     cli::cli_abort(
-      c(".flags debe ser TRUE o FALSE.",
-        "x" = "Se paso un {class(.flags)}"
-      ),
+      c(".flags debe ser TRUE o FALSE.", "x" = "Se paso un {class(.flags)}"),
       class = "no_logical"
     )
   }
@@ -85,26 +83,26 @@ estandarizar_personas <- function(
   # --------------------------------------------------------------------------
   anio <- unique(.P$PB010)
   pais <- unique(.P$PB020)
-  
+
   cli::cli_h1("Estandarizacion")
   .P <- estandarizar_personas_(.P, .R, .D, anio, pais)
-  
+
   if (.flags) {
     .P <- calc_flags_imputacion(.P, anio, pais)
   }
-  
+
   .P <- structure(
     .P,
-    "base"        = "P",
-    "estandar"    = TRUE,
-    "pre. 2021"   = anio < 2021,
-    "vbles. D"    = !is.null(.D),
-    "vbles. R"    = !is.null(.R),
+    "base" = "P",
+    "estandar" = TRUE,
+    "pre. 2021" = anio < 2021,
+    "vbles. D" = !is.null(.D),
+    "vbles. R" = !is.null(.R),
     "vble. PL130" = "PL130" %in% names(.P),
     "vble. PL230" = "PL230" %in% names(.P),
-    "flags imp."  = .flags
+    "flags imp." = .flags
   )
-  
+
   return(.P)
 }
 
@@ -117,11 +115,11 @@ estandarizar_personas <- function(
 #' conjunto final tiene todas las variables necesarias para aplicar
 #' [imputar_personas()] y [calcular_personas()]. Las variables que no están
 #' disponibles quedan como `NA`.
-#' 
+#'
 #' @details
 #' Esta función es el núcleo interno de [estandarizar_personas()]. Para más
 #' detalles ver la documentación de esa función.
-#' 
+#'
 #' @param .P `data.frame` o `tibble`. Conjunto de datos P de la EU-SILC.
 #' @param .R `data.frame` o `tibble`. Conjunto de datos R de la EU-SILC.
 #' @param .D `data.frame` o `tibble`. Conjunto de datos D de la EU-SILC.
@@ -152,6 +150,8 @@ estandarizar_personas_ <- function(.P, .R, .D, .anio, .pais) {
       PL040B = dplyr::if_else(PL032 != 1 | is.na(PL032), PL040, NA),
       PL051B = dplyr::if_else(PL032 != 1 | is.na(PL032), PL051, NA),
       PL111B = NA_character_,
+      toc = NA_integer_,
+      pomj = PL140,
       # Los flags hacen falta si después se imputa
       PL040A_F = dplyr::if_else(PL032 == 1, PL040_F, -2),
       PL051A_F = dplyr::if_else(PL032 == 1, PL051_F, -2),
@@ -166,32 +166,58 @@ estandarizar_personas_ <- function(.P, .R, .D, .anio, .pais) {
       " " = "No hace falta el conjunto R",
       " " = "Se pierde PL111B"
     ))
-  # Posterior a 2021 sin R -------------------
-  } else if (is.null(.R)) {
+    # Posterior a 2021 sin R -------------------
+  } else {
     .P <- dplyr::mutate(
       .P,
-      RB080 = PB010 - PX020 - 1,
-      RB081 = PX020,
-      RB082 = NA_integer_,
-      RB280 = NA_integer_,
-      RB290 = NA_integer_
+      toc = dplyr::case_when(
+        PL141 == 21 | PL141 == 11 ~ 1,
+        PL141 == 22 | PL141 == 12 ~ 2,
+        .default = NA_integer_
+      ),
+      pomj = dplyr::case_when(
+        PL141 == 21 | PL141 == 22 ~ 1,
+        PL141 == 11 | PL141 == 12 ~ 2,
+        .default = NA_integer_
+      )
     )
 
-    cli::cli_bullets(c(
-      "!" = "No se proporciono el conjunto R",
-      " " = "Se pierden: pd01a, pd04, pd05"
-    ))
-  # Posterior a 2021 con R -------------------
-  } else {
-    .P <- dplyr::left_join(
-      x  = .P,
-      y  = dplyr::select(.R, RB010, RB020, RB030, RB080, RB081, RB082, RB280, RB290),
-      by = dplyr::join_by(PB010 == RB010, PB020 == RB020, PB030 == RB030)
-    )
+    if (is.null(.R)) {
+      .P <- dplyr::mutate(
+        .P,
+        RB080 = PB010 - PX020 - 1,
+        RB081 = PX020,
+        RB082 = NA_integer_,
+        RB280 = NA_integer_,
+        RB290 = NA_integer_
+      )
 
-    cli::cli_bullets(c(
-      "v" = "La base corresponde al anio 2021 o posterior, y se proporciono el conjunto R"
-    ))
+      cli::cli_bullets(c(
+        "!" = "No se proporciono el conjunto R",
+        " " = "Se pierden: pd01a, pd04, pd05"
+      ))
+      # Posterior a 2021 con R -------------------
+    } else {
+      .P <- dplyr::left_join(
+        x = .P,
+        y = dplyr::select(
+          .R,
+          RB010,
+          RB020,
+          RB030,
+          RB080,
+          RB081,
+          RB082,
+          RB280,
+          RB290
+        ),
+        by = dplyr::join_by(PB010 == RB010, PB020 == RB020, PB030 == RB030)
+      )
+
+      cli::cli_bullets(c(
+        "v" = "La base corresponde al anio 2021 o posterior, y se proporciono el conjunto R"
+      ))
+    }
   }
 
   # Sin D ------------------------------------
@@ -202,11 +228,11 @@ estandarizar_personas_ <- function(.P, .R, .D, .anio, .pais) {
       "!" = "No se proporciono el conjunto D",
       " " = "Se pierden: pi03"
     ))
-  # Con D ------------------------------------
+    # Con D ------------------------------------
   } else {
     .P <- dplyr::left_join(
-      x  = .P,
-      y  = dplyr::select(.D, DB010, DB020, DB030, DB040),
+      x = .P,
+      y = dplyr::select(.D, DB010, DB020, DB030, DB040),
       by = dplyr::join_by(PB010 == DB010, PB020 == DB020, PX030 == DB030)
     )
 
@@ -235,7 +261,6 @@ estandarizar_personas_ <- function(.P, .R, .D, .anio, .pais) {
     cli::cli_bullets(c(
       "v" = "Se encontro la variable PL130"
     ))
-
   }
 
   if (.pais == "IT" & all(.P$PY120N_F == -4)) {
