@@ -2,3 +2,6 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^tests/tests_informales\.R$
+^data-raw$
+^AGENTS\.md$
+^\.agents$

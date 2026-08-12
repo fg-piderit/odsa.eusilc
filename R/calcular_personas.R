@@ -175,7 +175,7 @@ calcular_personas_ <- function(.P) {
   # PPA --------------------------------------
   .P <- dplyr::left_join(
     x = .P,
-    y = tabla_ppa,
+    y = tabla_ppa_,
     by = dplyr::join_by(PB010, PB020)
   )
 

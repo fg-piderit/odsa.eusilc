@@ -1,5 +1,5 @@
 #' Etiqueta un conjunto de datos EU-SILC armonizado
-#' 
+#'
 #' @description
 #' Aplica etiquetas a las variables y los valores de un conjunto de datos
 #' EU-SILC armonizado con [estandarizar_personas()] y [calcular_personas()].
@@ -21,13 +21,13 @@ etiquetar_eusilc <- function(.datos) {
 
 # ============================================================================
 #' Etiqueta un conjunto de datos EU-SILC armonizado (interna)
-#' 
+#'
 #' @description
 #' ¡Esta función es interna! Aplica etiquetas a las variables y los valores de
 #' un conjunto de datos EU-SILC armonizado con [estandarizar_personas()] y
 #' [calcular_personas()]. Sólo etiqueta las variables nuevas, no etiqueta las
 #' originales. Las etiquetas aplicadas se pueden ver en [etiquetas].
-#' 
+#'
 #' @details
 #' Esta función es el núcleo interno de [etiquetar_eusilc()]. Para más detalles,
 #' consultar la documentación de esa función.
@@ -37,15 +37,14 @@ etiquetar_eusilc <- function(.datos) {
 #'
 #' @returns `tibble`. Conjunto de datos armonizado P o H con variables y valores etiquetados
 etiquetar_eusilc_ <- function(.datos, .base) {
-
   .datos <- labelled::set_variable_labels(
     .datos,
-    .labels = etq[[.base]]$variables,
+    .labels = etiquetas_[[.base]]$variables,
     .strict = FALSE
   )
   .datos <- labelled::set_value_labels(
     .datos,
-    .labels = etq[[.base]]$valores,
+    .labels = etiquetas_[[.base]]$valores,
     .strict = FALSE
   )
 
@@ -54,7 +53,7 @@ etiquetar_eusilc_ <- function(.datos, .base) {
 
 # ============================================================================
 #' Convierte un data frame de etiquetas en una lista anidada
-#' 
+#'
 #' @description
 #' Toma un data frame con etiquetas de variables y valores y lo convierte en
 #' una lista anidada de etiquetas para aplicar con [etiquetar_eusilc()]. La
@@ -74,11 +73,23 @@ armar_etiquetas <- function(.etq) {
   etiquetas$P <- list()
   etiquetas$H <- list()
 
-  etiquetas$P$variables <- as.list(tibble::deframe(etq_p[, c("variable", "descripcion")]))
-  etiquetas$H$variables <- as.list(tibble::deframe(etq_h[, c("variable", "descripcion")]))
+  etiquetas$P$variables <- as.list(tibble::deframe(etq_p[, c(
+    "variable",
+    "descripcion"
+  )]))
+  etiquetas$H$variables <- as.list(tibble::deframe(etq_h[, c(
+    "variable",
+    "descripcion"
+  )]))
 
-  etiquetas$P$valores <- tibble::deframe(etq_p[!is.na(etq_p$valores), c("variable", "valores")])
-  etiquetas$H$valores <- tibble::deframe(etq_h[!is.na(etq_h$valores), c("variable", "valores")])
+  etiquetas$P$valores <- tibble::deframe(etq_p[
+    !is.na(etq_p$valores),
+    c("variable", "valores")
+  ])
+  etiquetas$H$valores <- tibble::deframe(etq_h[
+    !is.na(etq_h$valores),
+    c("variable", "valores")
+  ])
 
   return(etiquetas)
 }
