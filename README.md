@@ -37,15 +37,21 @@ información.
 
 # Instalación
 
-Para instalar `odsa.eusilc` es necesario contar previamente con el
-paquete `pak`.
+## Requisitos
+
+Para poder instalar `odsa.eusilc` desde el código fuente es necesario contar con
+[_RTools_](https://cran.r-project.org/bin/windows/Rtools/) en Windows,
+[_XCode command line tools_](https://developer.apple.com/documentation/xcode/installing-the-command-line-tools)
+en MacOS o el paquete `r-base-dev` en Ubuntu y Debian (o equivalente en otras distribuciones de Linux).
+
+Para instalar `odsa.eusilc` y sus dependencias se utiliza el paquete de R `pak`.
+Se instala una única vez ejecutando el siguiente comando:
 
 ```r
 # 'pak' ya está en CRAN
 install.packages("pak")
-# Una vez instalado se carga
-library(pak)
 ```
+
 ## Versión _release_ o estable
 
 La versión estable se instala a partir del archivo `odsa.eusilc_0.1.1.tar.gz`,
