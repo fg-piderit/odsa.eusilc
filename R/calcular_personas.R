@@ -144,9 +144,9 @@ calcular_personas <- function(.P, .expandir = FALSE) {
   chequear_perdidas(.P, "P")
 
   if (!.expandir) {
-    .P <- dplyr::select(.P, dplyr::any_of(names(etq$P$variables)))
+    .P <- dplyr::select(.P, dplyr::any_of(names(etiquetas_$P$variables)))
   } else {
-    .P <- dplyr::relocate(.P, dplyr::any_of(names(etq$P$variables)))
+    .P <- dplyr::relocate(.P, dplyr::any_of(names(etiquetas_$P$variables)))
   }
 
   attr(.P, "expandida") <- .expandir
@@ -518,7 +518,7 @@ calc_informalidad <- function(.PL040A, .PY030G, .PY035G, .nivel) {
 
 # ============================================================================
 calc_calidad <- function(.pl40a, .pl12a, .pomj) {
-  pl41 <- case_when(
+  pl41 <- dplyr::case_when(
     .pl40a == 3 & .pl12a == 1 ~ 1,
     .pl40a == 3 & .pl12a != 1 ~ 2,
     .pl40a == 1 & .pomj == 1 ~ 3,

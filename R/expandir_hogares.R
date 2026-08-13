@@ -59,9 +59,9 @@ expandir_hogares <- function(
   chequear_perdidas(.H, "H")
 
   if (!.expandir) {
-    .H <- dplyr::select(.H, dplyr::any_of(names(etq$H$variables)))
+    .H <- dplyr::select(.H, dplyr::any_of(names(etiquetas_$H$variables)))
   } else {
-    .H <- dplyr::relocate(.H, dplyr::any_of(names(etq$H$variables)))
+    .H <- dplyr::relocate(.H, dplyr::any_of(names(etiquetas_$H$variables)))
   }
 
   if (.etiquetar) {

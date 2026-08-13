@@ -1,8 +1,7 @@
 # Script para armar la tabla de factores de conversión a unidades de PPA
 # interna y externa
 
-library(tidyverse)
-library(readxl)
+devtools::load_all()
 
 load("R/sysdata.rda")
 
@@ -10,7 +9,7 @@ tabla_ppa <- readxl::read_xlsx("data-raw/xlsx/tabla_ppa.xlsx")
 
 tabla_ppa <-
   tabla_ppa |>
-  tidyr::pivot_longer(
+  dplyr::pivot_longer(
     cols = -PB020,
     names_to = "PB010",
     values_to = "ppa_factor",
@@ -20,12 +19,12 @@ tabla_ppa <-
 
 ppa_us <-
   tabla_ppa |>
-  filter(PB020 == "US") |>
-  select(-PB020)
+  dplyr::filter(PB020 == "US") |>
+  dplyr::select(-PB020)
 
 tabla_ppa_ <-
   tabla_ppa |>
-  left_join(ppa_us, by = "PB010", suffix = c("", "_us"))
+  tidyr::left_join(ppa_us, by = "PB010", suffix = c("", "_us"))
 
 usethis::use_data(tabla_ppa, overwrite = TRUE)
 usethis::use_data(

@@ -1,7 +1,5 @@
 # Script para armar tablas lookup
 
-library(readxl)
-
 load("R/sysdata.rda")
 
 tabla_isco <- readxl::read_xlsx("data-raw/xlsx/tabla_isco.xlsx")

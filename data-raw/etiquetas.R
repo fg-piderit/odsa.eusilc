@@ -1,8 +1,7 @@
 # Script para armar el conjunto de datos y las listas anidadas de etiquetas
 # para incluir en el paquete
 
-library(tidyverse)
-library(readxl)
+devtools::load_all()
 
 load("R/sysdata.rda")
 
@@ -12,7 +11,7 @@ etiquetas_ <- armar_etiquetas(etiquetas)
 usethis::use_data(etiquetas, overwrite = TRUE)
 usethis::use_data(
   etiquetas_,
-  tabla_ppa,
+  tabla_ppa_,
   tabla_isco,
   tabla_pd03,
   tabla_pl01,
