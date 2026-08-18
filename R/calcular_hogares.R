@@ -115,9 +115,9 @@ calcular_hogares <- function(.H, .P, .expandir = FALSE) {
   chequear_perdidas(.H, "H")
   
   if (!.expandir) {
-    .H <- dplyr::select(.H, dplyr::any_of(names(etq$H$variables)))
+    .H <- dplyr::select(.H, dplyr::any_of(names(etiquetas_$H$variables)))
   } else {
-    .H <- dplyr::relocate(.H, dplyr::any_of(names(etq$H$variables)))
+    .H <- dplyr::relocate(.H, dplyr::any_of(names(etiquetas_$H$variables)))
   }
   
   .H <- structure(
@@ -151,7 +151,7 @@ calcular_hogares_ <- function(.H) {
   # Lookup -----------------------------------
   .H <- dplyr::left_join(
     x = .H,
-    y = tabla_ppa,
+    y = tabla_ppa_,
     by = dplyr::join_by(HB010 == PB010, HB020 == PB020)
   )
   

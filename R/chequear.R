@@ -227,7 +227,7 @@ chequear_bases_hogares <- function(.H, .P, .D) {
 #'
 #' @returns Nada
 chequear_perdidas <- function(.datos, .base) {
-  perdidas <- sapply(names(etq[[.base]]$variables), \(.v) {
+  perdidas <- sapply(names(etiquetas_[[.base]]$variables), \(.v) {
     if (.v %in% names(.datos)) all(is.na(.datos[.v])) else FALSE
   })
   perdidas <- names(which(perdidas))

@@ -6,12 +6,11 @@
 \title{Tabla de factores de conversión a unidades de Paridad de Poder Adquisitivo}
 \format{
 tabla_ppa
-A tibble: 56 x 3
+A tibble: 390 x 3
 \describe{
 \item{PB010}{Año}
 \item{PB020}{País}
 \item{ppa_factor}{Factor de conversión a unidades de PPA de la Unión Europea 27 países}
-\item{ppa_factor_us}{Factor de conversión de dólares a unidades de PPA de la Unión Europea 27 países}
 }
 }
 \source{
@@ -31,7 +30,7 @@ países a unidades de PPA en dólares. \code{\link[=calcular_personas]{calcular_
 \code{\link[=calcular_hogares]{calcular_hogares()}} utilizan las variables PX010 y HX010 (\emph{change rate euro
 to national currency}) para convertir los montos a moneda nacional,
 \code{ppa_factor} para convertirlos a unidades de PPA en euros de la Unión
-Europea 27 países y finalmente \code{ppa_factor_us} para convertirlos a unidades
-de PPA en dólares estadounidenses.
+Europea 27 países y finalmente la inversa del factor de conversión de los
+Estados Unidos para convertirlos a unidades de PPA en dólares estadounidenses.
 }
 \keyword{datasets}

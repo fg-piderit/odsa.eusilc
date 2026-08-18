@@ -75,6 +75,7 @@ A continuación se listan las variables construidas según bloque
 \item pl31\if{html}{\out{<sup>}}1\if{html}{\out{</sup>}}. Sector de inserción
 \item pl40a. Informalidad laboral (4 categorías)
 \item pl40b. Informalidad laboral (2 categorías)
+\item pl41. Empleo de calidad
 \item pl50. EGP
 }
 
@@ -118,6 +119,8 @@ en el conjunto final por si son de utilidad.
 \item han. Horas habitualmente trabajadas anuales, trabajadores no asalariados
 \item maa. Meses con ingresos por trabajo asalariado en el IRP
 \item man. Meses con ingresos por trabajo no asalariado en el IRP
+\item toc. Tipo de contrato (verbal o por escrito)
+\item pomj. Permanencia del trabajo principal (permanente o temporal)
 \item .f_(variable)\if{html}{\out{<sup>}}3\if{html}{\out{</sup>}}. Flag de imputación de la variable. Para más detalle, ver \code{\link[=imputar_personas]{imputar_personas()}}
 }
 
