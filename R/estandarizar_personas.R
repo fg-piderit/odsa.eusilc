@@ -26,8 +26,8 @@
 #' * Variables demográficas: Región de residencia, edad, país de nacimiento,
 #'   país de ciudadanía y nivel educativo.
 #' * Variables laborales: Condición de actividad, categoría ocupacional,
-#'   ocupación, rama de actividad, tamaño del establecimiento y sector público
-#'   o privado.
+#'   ocupación, rama de actividad, tamaño del establecimiento, sector público
+#'   o privado, tipo de contrato y permanencia del trabajo principal.
 #' * Variables de ingreso: transferencias por enfermedad.
 #'
 #' Más en particular, la función se encarga de los siguientes problemas. Si el
@@ -45,6 +45,8 @@
 #' * El sector público privado está disponbile los años en los que se
 #'   relevó el módulo _labor market and housing conditions (LMH)_ y queda como `NA`
 #'   los años en los que no.
+#' * No hay información acerca del tipo de contrato (verbal o por escrito) y
+#'   queda como `NA`.
 #'
 #' Si el conjunto de datos corresponde al año 2021 o posterior, entonces:
 #'
@@ -53,6 +55,8 @@
 #' * El tamaño del establecimiento y el sector público privado están disponibles
 #'   sólo en los años en los que se relevó el módulo _LMH_ y quedan como `NA`
 #'   los años en los que no.
+#' * El tipo de contrato y la permanencia del trabajo principal se incluyen
+#'   en una única variable.
 #'
 #' Cualquiera sea el año, si no se proporciona el conjunto D, entonces la
 #' región de residencia queda como `NA`. Además, si el país es Italia, entonces

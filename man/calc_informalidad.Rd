@@ -2,7 +2,7 @@
 % Please edit documentation in R/calcular_personas.R
 \name{calc_informalidad}
 \alias{calc_informalidad}
-\title{Clacula el clasificador de informalidad laboral según aportes a la seguridad social}
+\title{Calcula el clasificador de informalidad laboral según aportes a la seguridad social}
 \usage{
 calc_informalidad(.PL040A, .PY030G, .PY035G, .nivel)
 }
@@ -19,5 +19,5 @@ calc_informalidad(.PL040A, .PY030G, .PY035G, .nivel)
 \code{numeric}. Clasificador de informalidad laboral
 }
 \description{
-Clacula el clasificador de informalidad laboral según aportes a la seguridad social
+Calcula el clasificador de informalidad laboral según aportes a la seguridad social
 }

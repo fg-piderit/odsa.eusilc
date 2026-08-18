@@ -63,6 +63,7 @@
 #' - pl31<sup>1</sup>. Sector de inserción
 #' - pl40a. Informalidad laboral (4 categorías)
 #' - pl40b. Informalidad laboral (2 categorías)
+#' - pl41. Empleo de calidad
 #' - pl50. EGP
 #'
 #' Nota 1: Dependen de las variables PL130 y PL230 del módulo LMH
@@ -102,6 +103,8 @@
 #' - han. Horas habitualmente trabajadas anuales, trabajadores no asalariados
 #' - maa. Meses con ingresos por trabajo asalariado en el IRP
 #' - man. Meses con ingresos por trabajo no asalariado en el IRP
+#' - toc. Tipo de contrato (verbal o por escrito)
+#' - pomj. Permanencia del trabajo principal (permanente o temporal)
 #' - .f_(variable)<sup>3</sup>. Flag de imputación de la variable. Para más detalle, ver [imputar_personas()]
 #'
 #' Nota 3: Estas variables están presentes sólo si se imputaron los datos insumo.
@@ -517,6 +520,13 @@ calc_informalidad <- function(.PL040A, .PY030G, .PY035G, .nivel) {
 }
 
 # ============================================================================
+#' Calcula el indicador de empleo de calidad
+#'
+#' @param .pl40a `numeric`. Informalidad y asalarización
+#' @param .pl12a `numeric`. Calificación de la ocupación
+#' @param .pomj `numeric`. Permanencia del trabajo principal
+#'
+#' @returns `numeric`. Indicador de empleo de calidad
 calc_calidad <- function(.pl40a, .pl12a, .pomj) {
   pl41 <- dplyr::case_when(
     .pl40a == 3 & .pl12a == 1 ~ 1,

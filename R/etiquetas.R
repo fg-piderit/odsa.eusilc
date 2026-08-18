@@ -4,10 +4,11 @@
 #' son factores.
 #'
 #' @format ## `etiquetas`
-#' A tibble: 202 x 5
+#' A tibble: 336 x 6
 #' \describe{
 #'   \item{variable}{Nombre de la variable en el conjunto de datos expandido}
-#'   \item{base}{Conjunto de datos al que corresponde la variable (P o H)}
+#'   \item{conjunto}{Conjunto de datos al que corresponde la variable (P o H)}
+#'   \item{bloque}{Bloque de variables al que corresponde}
 #'   \item{descripcion}{Descripcion de la variable}
 #'   \item{etiqueta}{Descripcion de la categoria}
 #'   \item{valor}{Codigo de la categoria}
