@@ -1,3 +1,7 @@
+# odsa.eusilc (development version)
+
+- Se incorpora la creación de la variable `pl41` empleo de calidad.
+
 # odsa.eusilc 0.1.1
 
 - Se corrige un error en la estandarización de las bases. Se separaba el

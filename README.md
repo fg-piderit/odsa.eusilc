@@ -224,7 +224,7 @@ personas <- odsa.eusilc::expandir_personas(P, D, R, .imputar = FALSE)
 ```
 
 El conjunto `personas` conserva la misma cantidad de filas que `P` e
-incorpora 73 variables nuevas, con variables y valores etiquetados.
+incorpora 80 variables nuevas, con variables y valores etiquetados.
 
 Luego se crea la base de nivel hogar. El procedimiento es similar y el conjunto
 resultante también queda etiquetado.
