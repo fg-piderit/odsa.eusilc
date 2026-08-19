@@ -266,10 +266,10 @@ calcular_personas_ <- function(.P) {
     pl12c = calc_variante_c(PL032, pl12a, pl12b),
     pl13c = calc_variante_c(PL032, pl13a, pl13b),
     pl20c = calc_variante_c(PL032, pl20a, pl20b),
-    pl50  = calc_egp(PL051A, PL040A, PL150),
+    pl50 = calc_egp(PL051A, PL040A, PL150),
     pl40a = calc_informalidad(PL040A, PY030G, PY035G, "a"),
     pl40b = calc_informalidad(PL040A, PY030G, PY035G, "b"),
-    pl41  = calc_calidad(pl40a, pl12a, pomj),
+    pl41 = calc_calidad(pl40a, pl12a, pomj),
     # Bloque Y -----------------------
     py00 = PY010N +
       PY050N +
@@ -496,6 +496,10 @@ calc_egp <- function(.PL051A, .PL040A, .PL150) {
 #'
 #' @returns `numeric`. Clasificador de informalidad laboral
 calc_informalidad <- function(.PL040A, .PY030G, .PY035G, .nivel) {
+  if (all(is.na(.PY030G))) {
+    return(NA_integer_)
+  }
+
   if (.nivel == "a") {
     pl40 <- dplyr::case_when(
       .PL040A == 3 & .PY030G != 0 ~ 1,
