@@ -220,6 +220,24 @@ chequear_bases_hogares <- function(.H, .P, .D) {
 }
 
 # ============================================================================
+#' Chequea si alguno de los insumos esta completamente perdido
+#'
+#' @param ... Vectores insumo
+#'
+#' @returns `TRUE` si alguno de los insumos esta completamente perdido
+chequear_insumos_perdidos <- function(...) {
+  insumos <- list(...)
+
+  perdidos <- vapply(
+    insumos,
+    \(insumo) length(insumo) > 0L && all(is.na(insumo)),
+    logical(1)
+  )
+
+  return(any(perdidos))
+}
+
+# ============================================================================
 #' Chequea y avisa qué variables están completamente perdidas
 #'
 #' @param .datos `tibble`. Conjunto de datos

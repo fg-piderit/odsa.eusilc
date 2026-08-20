@@ -280,8 +280,8 @@ estandarizar_personas_ <- function(.P, .R, .D, .anio, .pais) {
     cli::cli_bullets(c(
       "!" = "El pais es Alemania y el anio anterior a 2020",
       " " = "PY030G (employers' social insurance contributions) no fue registrada",
-      " " = "No se registran los ingresos laborales netos, solo los brutos",
-      " " = "Se pierden: pl40a, pl40b, pl41, py00, py10, py11, py12, py13, py14, py15, py20, py21, py23."
+      " " = "No se registran todos los ingresos netos",
+      " " = "Se pierden: pl40a, pl40b, pl41, y las variables de ingreso, salvo py22, py24 y py25"
     ))
   }
 
