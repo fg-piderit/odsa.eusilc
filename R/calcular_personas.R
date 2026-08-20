@@ -266,10 +266,10 @@ calcular_personas_ <- function(.P) {
     pl12c = calc_variante_c(PL032, pl12a, pl12b),
     pl13c = calc_variante_c(PL032, pl13a, pl13b),
     pl20c = calc_variante_c(PL032, pl20a, pl20b),
-    pl50  = calc_egp(PL051A, PL040A, PL150),
+    pl50 = calc_egp(PL051A, PL040A, PL150),
     pl40a = calc_informalidad(PL040A, PY030G, PY035G, "a"),
     pl40b = calc_informalidad(PL040A, PY030G, PY035G, "b"),
-    pl41  = calc_calidad(pl40a, pl12a, pomj),
+    pl41 = calc_calidad(pl40a, pl12a, pomj),
     # Bloque Y -----------------------
     py00 = PY010N +
       PY050N +
@@ -426,6 +426,19 @@ calc_heterogeneidad <- function(
   .pl13,
   .nivel
 ) {
+  if (
+    chequear_insumos_perdidos(
+      .PL040A,
+      .PL032,
+      .pl20,
+      .pl21b,
+      .pl22,
+      .pl13
+    )
+  ) {
+    return(NA_integer_)
+  }
+
   if (.nivel == "a") {
     pl3x <- dplyr::case_when(
       .PL040A == 1 & .pl21b > 1 ~ 1,
@@ -467,6 +480,10 @@ calc_heterogeneidad <- function(
 #'
 #' @returns `numeric`. Clasificador de clase de EGP
 calc_egp <- function(.PL051A, .PL040A, .PL150) {
+  if (chequear_insumos_perdidos(.PL051A, .PL040A, .PL150)) {
+    return(NA_integer_)
+  }
+
   .pl50 <- dplyr::recode_values(
     .PL051A,
     from = tabla_isco$PL051,
@@ -496,6 +513,10 @@ calc_egp <- function(.PL051A, .PL040A, .PL150) {
 #'
 #' @returns `numeric`. Clasificador de informalidad laboral
 calc_informalidad <- function(.PL040A, .PY030G, .PY035G, .nivel) {
+  if (chequear_insumos_perdidos(.PL040A, .PY030G, .PY035G)) {
+    return(NA_integer_)
+  }
+
   if (.nivel == "a") {
     pl40 <- dplyr::case_when(
       .PL040A == 3 & .PY030G != 0 ~ 1,
@@ -528,6 +549,10 @@ calc_informalidad <- function(.PL040A, .PY030G, .PY035G, .nivel) {
 #'
 #' @returns `numeric`. Indicador de empleo de calidad
 calc_calidad <- function(.pl40a, .pl12a, .pomj) {
+  if (chequear_insumos_perdidos(.pl40a, .pl12a, .pomj)) {
+    return(NA_integer_)
+  }
+
   pl41 <- dplyr::case_when(
     .pl40a == 3 & .pl12a == 1 ~ 1,
     .pl40a == 3 & .pl12a != 1 ~ 2,
@@ -550,6 +575,10 @@ calc_calidad <- function(.pl40a, .pl12a, .pomj) {
 #'
 #' @returns `numeric`. Ingresos laborales provenientes de determinado sector, 0 el resto
 calc_y_sector <- function(.py10, .pl31, .sector) {
+  if (chequear_insumos_perdidos(.py10, .pl31)) {
+    return(NA_real_)
+  }
+
   py1x <- dplyr::case_when(
     .py10 != 0 & is.na(.pl31) ~ NA_real_,
     .py10 != 0 & .pl31 == .sector ~ .py10,
@@ -568,6 +597,10 @@ calc_y_sector <- function(.py10, .pl31, .sector) {
 #'
 #' @returns `numeric`. Características de la ocupación actual o de la última ocupación
 calc_variante_c <- function(.PL032, .a, .b) {
+  if (chequear_insumos_perdidos(.PL032, .a, .b)) {
+    return(NA_integer_)
+  }
+
   plxxc <- dplyr::case_when(
     .PL032 == 1 ~ .a,
     .PL032 != 1 ~ .b,
