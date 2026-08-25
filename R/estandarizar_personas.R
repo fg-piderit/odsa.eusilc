@@ -307,8 +307,27 @@ estandarizar_paises_personas <- function(.P, .anio, .pais) {
     .P <- dplyr::mutate(.P, PY120N = 0)
 
     cli::cli_bullets(c(
-      "!" = "El pais es Italia y PY120N (sickness benefits) se incluye en otro monto",
-      " " = "Se deja en cero"
+      "!" = "El pais es Italia",
+      " " = "PY120N (sickness benefits) se incluye en otro monto y se deja en cero"
+    ))
+  }
+
+  if (
+    .pais == "PL" &&
+      .anio == 2020 &&
+      "PL130_F" %in% names(.P) &&
+      all(.P$PL130_F == -8)
+  ) {
+    cli::cli_bullets(c(
+      "!" = "El pais es Polonia y el anio es 2020",
+      " " = "PL130 no esta disponible y queda como NA"
+    ))
+  }
+
+  if (.pais == "PT" && .anio %in% 2014:2017) {
+    cli::cli_bullets(c(
+      "!" = "El pais es Portugal y el anio esta entre 2014 y 2017",
+      " " = "DB040 no esta disponible y queda como NA"
     ))
   }
 
