@@ -9,7 +9,7 @@ tabla_ppa <- readxl::read_xlsx("data-raw/xlsx/tabla_ppa.xlsx")
 
 tabla_ppa <-
   tabla_ppa |>
-  dplyr::pivot_longer(
+  tidyr::pivot_longer(
     cols = -PB020,
     names_to = "PB010",
     values_to = "ppa_factor",
@@ -24,7 +24,7 @@ ppa_us <-
 
 tabla_ppa_ <-
   tabla_ppa |>
-  tidyr::left_join(ppa_us, by = "PB010", suffix = c("", "_us"))
+  dplyr::left_join(ppa_us, by = "PB010", suffix = c("", "_us"))
 
 usethis::use_data(tabla_ppa, overwrite = TRUE)
 usethis::use_data(
