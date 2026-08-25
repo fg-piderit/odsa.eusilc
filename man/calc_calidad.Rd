@@ -14,7 +14,7 @@ calc_calidad(.pl40a, .pl12a, .pomj)
 \item{.pomj}{\code{numeric}. Permanencia del trabajo principal}
 }
 \value{
-Indicador de empleo de calidad
+\code{numeric}. Indicador de empleo de calidad
 }
 \description{
 Calcula el indicador de empleo de calidad
