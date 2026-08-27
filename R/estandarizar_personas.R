@@ -341,7 +341,7 @@ estandarizar_paises_personas <- function(.P, .anio, .pais) {
   if (.pais == "PT") {
     cli::cli_bullets(c(
       "!" = "El pais es Portugal",
-      " " = "PL051 agrupa los códigos 11, 12 y 13 en 14; todos los gerentes quedan como tecnicos"
+      " " = "PL051 agrupa los codigos 11, 12 y 13 en 14; todos los gerentes quedan como tecnicos"
     ))
   }
 
