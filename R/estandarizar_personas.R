@@ -323,11 +323,25 @@ estandarizar_paises_personas <- function(.P, .anio, .pais) {
       " " = "PL130 no esta disponible y queda como NA"
     ))
   }
+  
+  if (.pais == "PL" & .anio >= 2016) {
+    cli::cli_bullets(c(
+      "!" = "El pais es Polonia y el anio es posterior a 2016",
+      " " = "PE041 esta desagregada; se trunca pd03 en 5 para mantener la comparabilidad."
+    ))
+  }
 
   if (.pais == "PT" && .anio %in% 2014:2017) {
     cli::cli_bullets(c(
       "!" = "El pais es Portugal y el anio esta entre 2014 y 2017",
       " " = "DB040 no esta disponible y queda como NA"
+    ))
+  }
+  
+  if (.pais == "PT") {
+    cli::cli_bullets(c(
+      "!" = "El pais es Portugal",
+      " " = "PL051 agrupa los códigos 11, 12 y 13 en 14; todos los gerentes quedan como tecnicos"
     ))
   }
 
