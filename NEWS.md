@@ -2,6 +2,8 @@
 
 - Se incorpora la creación de la variable `pl41` empleo de calidad.
 - Se modifican algunas etiquetas de las variables `pl20a/b/c`.
+- Se cambia la recodificación `PE041 -> pd03`; el nivel 4 ISCED pasa a
+"secundario completo" y los niveles 5 a 8 de ISCED a "terciario incompleto o más".
 
 # odsa.eusilc 0.1.1
 
