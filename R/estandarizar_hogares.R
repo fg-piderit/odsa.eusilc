@@ -19,15 +19,17 @@ estandarizar_hogares <- function(.H, .D = NULL) {
   
   # --------------------------------------------------------------------------
   cli::cli_h1("Estandarizacion")
-  informar_advertencias_estandarizacion(.H)
+  advertencias <- obtener_advertencias("H", anio, pais)
   informar_insumos_hogares(.D)
+  
   .H <- estandarizar_hogares_(.H, .D, anio, pais)
   
   .H <- structure(
     .H,
     "base"      = "H",
     "estandar"  = TRUE,
-    "vbles. D"  = !is.null(.D)
+    "vbles. D"  = !is.null(.D),
+    "advertencias" = advertencias
   )
   
   return(.H)

@@ -89,8 +89,9 @@ estandarizar_personas <- function(
   pais <- unique(.P$PB020)
 
   cli::cli_h1("Estandarizacion")
-  informar_advertencias_estandarizacion(.P)
+  advertencias <- obtener_advertencias("P", anio, pais)
   informar_insumos_personas(.P, .D, .R, anio)
+  
   .P <- estandarizar_personas_(.P, .R, .D, anio, pais)
 
   if (.flags) {
@@ -106,7 +107,8 @@ estandarizar_personas <- function(
     "vbles. R" = !is.null(.R),
     "vble. PL130" = "PL130" %in% names(.P),
     "vble. PL230" = "PL230" %in% names(.P),
-    "flags imp." = .flags
+    "flags imp." = .flags,
+    "advertencias" = advertencias
   )
 
   return(.P)

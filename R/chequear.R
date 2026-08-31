@@ -260,3 +260,48 @@ chequear_perdidas <- function(.datos, .base) {
     ))
   }
 }
+
+# ============================================================================
+obtener_contexto_advertencias <- function(.datos) {
+
+  identificadores <- list(
+    P = list(c("PB010", "PB020"), c("pi01", "pi02")),
+    H = list(c("HB010", "HB020"), c("hi01", "hi02"))
+  )
+
+  contexto <- NULL
+  for (base in names(identificadores)) {
+    for (columnas in identificadores[[base]]) {
+      if (all(columnas %in% names(.datos))) {
+        contexto <- list(
+          base = base,
+          anio = unique(.datos[[columnas[1]]]),
+          pais = unique(.datos[[columnas[2]]])
+        )
+        break
+      }
+    }
+    if (!is.null(contexto)) break
+  }
+
+  if (is.null(contexto)) {
+    rlang::abort(
+      "No se pudo identificar si .datos es una base P o H.",
+      class = "base_desconocida"
+    )
+  }
+  if (length(contexto$anio) != 1 || is.na(contexto$anio)) {
+    rlang::abort(
+      ".datos debe corresponder a un unico anio.",
+      class = "varios_anios"
+    )
+  }
+  if (length(contexto$pais) != 1 || is.na(contexto$pais)) {
+    rlang::abort(
+      ".datos debe corresponder a un unico pais.",
+      class = "varios_paises"
+    )
+  }
+
+  contexto
+}

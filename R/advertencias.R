@@ -1,0 +1,23 @@
+#' Advertencias documentadas para la estandarizacion de EU-SILC
+#'
+#' Contiene perdidas de informacion, problemas de la UDB y diferencias de
+#' comparabilidad que afectan variables utilizadas por el paquete.
+#'
+#' @format ## `advertencias_estandarizacion`
+#' Un tibble con una fila por advertencia, anio, pais y variable:
+#' \describe{
+#'   \item{id_advertencia}{Identificador estable de la advertencia.}
+#'   \item{anio}{Anio de la operacion EU-SILC.}
+#'   \item{pais}{Codigo de pais de dos letras.}
+#'   \item{base}{Flujo de estandarizacion afectado: P o H.}
+#'   \item{conjunto_origen}{Conjunto donde se encuentra la variable.}
+#'   \item{variable}{Variable original afectada.}
+#'   \item{tipo}{Clase de perdida o diferencia documentada.}
+#'   \item{advertencia}{Descripcion breve del problema.}
+#'   \item{consecuencia}{Resultados del paquete afectados.}
+#'   \item{accion_paquete}{Tratamiento que aplica el paquete.}
+#'   \item{fuente}{Documento general utilizado como fuente.}
+#' }
+#' @source Documentacion de EU-SILC disponible con las entregas UDB de
+#'   Eurostat.
+"advertencias_estandarizacion"

@@ -46,8 +46,9 @@ expandir_hogares <- function(
   pais <- unique(.H$HB020)
 
   cli::cli_h1("Estandarizacion")
-  informar_advertencias_estandarizacion(.H)
+  advertencias <- obtener_advertencias("H", anio, pais)
   informar_insumos_hogares(.D)
+  
   .H <- estandarizar_hogares_(.H, .D, anio, pais)
 
   cli::cli_h1("Calcular variables nuevas")
@@ -75,7 +76,8 @@ expandir_hogares <- function(
     "base"      = "H",
     "vbles. D"  = !is.null(.D),
     "vbles. LMH"= attr(.P, "vble. PL230"),
-    "expandida" = .expandir
+    "expandida" = .expandir,
+    "advertencias" = advertencias
   )
 
   return(.H)
