@@ -107,6 +107,8 @@ expandir_personas <- function(
   vble_PL230 <- "PL230" %in% names(.P)
 
   cli::cli_h1("Estandarizacion")
+  informar_advertencias_estandarizacion(.P)
+  informar_insumos_personas(.P, .D, .R, anio)
   .P <- estandarizar_personas_(.P, .R, .D, anio, pais)
 
   if (.imputar) {

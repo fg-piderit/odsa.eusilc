@@ -89,6 +89,8 @@ estandarizar_personas <- function(
   pais <- unique(.P$PB020)
 
   cli::cli_h1("Estandarizacion")
+  informar_advertencias_estandarizacion(.P)
+  informar_insumos_personas(.P, .D, .R, anio)
   .P <- estandarizar_personas_(.P, .R, .D, anio, pais)
 
   if (.flags) {
@@ -140,28 +142,6 @@ estandarizar_personas_ <- function(.P, .R, .D, .anio, .pais) {
 
   .P <- agregar_d_personas(.P, .D)
 
-  if (!("PL230" %in% names(.P))) {
-    cli::cli_bullets(c(
-      "!" = "No se encontro PL230",
-      " " = "Se pierden: pl22, pl30, pl31, py13, py14, py15."
-    ))
-  } else {
-    cli::cli_bullets(c(
-      "v" = "Se encontro la variable PL230"
-    ))
-  }
-
-  if (!("PL130" %in% names(.P))) {
-    cli::cli_bullets(c(
-      "!" = "No se encontro PL130",
-      " " = "Se pierden: pl21a, pl21b, pl30, pl31, py13, py14, py15."
-    ))
-  } else {
-    cli::cli_bullets(c(
-      "v" = "Se encontro la variable PL130"
-    ))
-  }
-
   .P <- estandarizar_paises_personas(.P, .anio, .pais)
   .P <- calcular_auxiliares_personas(.P, .anio)
 
@@ -207,11 +187,6 @@ estandarizar_anio_personas <- function(.P, .anio) {
       PL111B_F = -2,
     )
 
-    cli::cli_bullets(c(
-      "!" = "La base corresponde al {(.anio)}, anterior a 2021",
-      " " = "No hace falta el conjunto R",
-      " " = "Se pierde PL111B"
-    ))
   }
 
   return(.P)
@@ -235,10 +210,6 @@ agregar_r_personas <- function(.P, .R) {
       RB290 = NA_integer_
     )
 
-    cli::cli_bullets(c(
-      "!" = "No se proporciono el conjunto R",
-      " " = "Se pierden: pd01a, pd04, pd05"
-    ))
   } else {
     .P <- dplyr::left_join(
       x = .P,
@@ -255,10 +226,6 @@ agregar_r_personas <- function(.P, .R) {
       ),
       by = dplyr::join_by(PB010 == RB010, PB020 == RB020, PB030 == RB030)
     )
-
-    cli::cli_bullets(c(
-      "v" = "La base corresponde al anio 2021 o posterior, y se proporciono el conjunto R"
-    ))
   }
 
   return(.P)
@@ -275,20 +242,12 @@ agregar_d_personas <- function(.P, .D) {
   if (is.null(.D)) {
     .P <- dplyr::mutate(.P, DB040 = NA_character_)
 
-    cli::cli_bullets(c(
-      "!" = "No se proporciono el conjunto D",
-      " " = "Se pierden: pi03"
-    ))
   } else {
     .P <- dplyr::left_join(
       x = .P,
       y = dplyr::select(.D, DB010, DB020, DB030, DB040),
       by = dplyr::join_by(PB010 == DB010, PB020 == DB020, PX030 == DB030)
     )
-
-    cli::cli_bullets(c(
-      "v" = "Se proporciono el conjunto D"
-    ))
   }
 
   return(.P)
@@ -305,53 +264,6 @@ agregar_d_personas <- function(.P, .D) {
 estandarizar_paises_personas <- function(.P, .anio, .pais) {
   if (.pais == "IT" & all(.P$PY120N_F == -4)) {
     .P <- dplyr::mutate(.P, PY120N = 0)
-
-    cli::cli_bullets(c(
-      "!" = "El pais es Italia",
-      " " = "PY120N (sickness benefits) se incluye en otro monto y se deja en cero"
-    ))
-  }
-
-  if (
-    .pais == "PL" &&
-      .anio == 2020 &&
-      "PL130_F" %in% names(.P) &&
-      all(.P$PL130_F == -8)
-  ) {
-    cli::cli_bullets(c(
-      "!" = "El pais es Polonia y el anio es 2020",
-      " " = "PL130 no esta disponible y queda como NA"
-    ))
-  }
-  
-  if (.pais == "PL" & .anio >= 2016) {
-    cli::cli_bullets(c(
-      "!" = "El pais es Polonia y el anio es posterior a 2016",
-      " " = "PE041 esta desagregada; se trunca pd03 en 5 para mantener la comparabilidad."
-    ))
-  }
-
-  if (.pais == "PT" && .anio %in% 2014:2017) {
-    cli::cli_bullets(c(
-      "!" = "El pais es Portugal y el anio esta entre 2014 y 2017",
-      " " = "DB040 no esta disponible y queda como NA"
-    ))
-  }
-  
-  if (.pais == "PT") {
-    cli::cli_bullets(c(
-      "!" = "El pais es Portugal",
-      " " = "PL051 agrupa los codigos 11, 12 y 13 en 14; todos los gerentes quedan como tecnicos"
-    ))
-  }
-
-  if (.pais == "DE" & .anio < 2020) {
-    cli::cli_bullets(c(
-      "!" = "El pais es Alemania y el anio anterior a 2020",
-      " " = "PY030G (employers' social insurance contributions) no fue registrada",
-      " " = "No se registran todos los ingresos netos",
-      " " = "Se pierden: pl40a, pl40b, pl41, y las variables de ingreso, salvo py22, py24 y py25"
-    ))
   }
 
   return(.P)

@@ -16,6 +16,7 @@ Imports:
     dplyr,
     labelled,
     missRanger,
+    rlang,
     tibble,
     tidyr
 Depends: 

@@ -46,6 +46,8 @@ expandir_hogares <- function(
   pais <- unique(.H$HB020)
 
   cli::cli_h1("Estandarizacion")
+  informar_advertencias_estandarizacion(.H)
+  informar_insumos_hogares(.D)
   .H <- estandarizar_hogares_(.H, .D, anio, pais)
 
   cli::cli_h1("Calcular variables nuevas")

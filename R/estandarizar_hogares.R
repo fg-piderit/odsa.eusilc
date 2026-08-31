@@ -19,6 +19,8 @@ estandarizar_hogares <- function(.H, .D = NULL) {
   
   # --------------------------------------------------------------------------
   cli::cli_h1("Estandarizacion")
+  informar_advertencias_estandarizacion(.H)
+  informar_insumos_hogares(.D)
   .H <- estandarizar_hogares_(.H, .D, anio, pais)
   
   .H <- structure(
@@ -54,16 +56,8 @@ estandarizar_hogares_ <- function(.H, .D, .anio, .pais) {
       by = dplyr::join_by(HB010 == DB010, HB020 == DB020, HB030 == DB030)
     )
 
-    cli::cli_bullets(c(
-      "v" = "Se proporciono el conjunto D"
-    ))
   } else {
     .H <- dplyr::mutate(.H, DB090 = NA_real_)
-
-    cli::cli_bullets(c(
-      "!" = "No se proporciono el conjunto D",
-      " " = "Se pierde: hi06"
-    ))
   }
 
   return(.H)

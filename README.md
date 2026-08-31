@@ -189,13 +189,21 @@ flexibilidad al proceso.
 
 # Tablas auxiliares
 
-El paquete también ofrece dos tablas auxiliares con información
+El paquete también ofrece tablas auxiliares con información
 potencialmente relevante:
 
 -   `tabla_ppa`. Contiene los factores de conversión a PPA en dólares de
     Estados Unidos para un gran número de países europeos.
 -   `etiquetas`. El diseño de registro de las bases de datos que
     construyen `expandir_personas` y `expandir_hogares`.
+-   `advertencias_estandarizacion`. Pérdidas de información, problemas UDB y
+    diferencias de comparabilidad documentadas para las variables que usa el
+    paquete.
+-   `cobertura_advertencias`. Países y años incluidos en la revisión
+    documental de las advertencias.
+
+Las advertencias correspondientes a una base concreta también se pueden
+consultar con `consultar_advertencias()`.
 
 
 # Ejemplo de uso

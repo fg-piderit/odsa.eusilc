@@ -2,6 +2,7 @@
 
 export(calcular_hogares)
 export(calcular_personas)
+export(consultar_advertencias)
 export(estandarizar_hogares)
 export(estandarizar_personas)
 export(etiquetar_eusilc)
