@@ -1,4 +1,11 @@
 # ============================================================================
+#' Obtiene las advertencias correspondientes a un país, año y tipo de base
+#'
+#' @param .base `character`. Tipo de base, 'P' o 'H'.
+#' @param .anio `numeric`. Año de la encuesta.
+#' @param .pais `character`. País de la encuesta.
+#'
+#' @returns `tibble`. Advertencias por variable para el país, año y base.
 obtener_advertencias <- function(.base, .anio, .pais) {
   advertencias <- dplyr::filter(
     tabla_advertencias,
@@ -37,6 +44,14 @@ obtener_advertencias <- function(.base, .anio, .pais) {
 }
 
 # ============================================================================
+#' Advierte la pérdida de variables ante la falta de insumos
+#'
+#' @param .P `tibble`. Conjunto de datos P de la EU-SILC.
+#' @param .D `tibble`. Conjunto de datos D de la EU-SILC.
+#' @param .R `tibble`. Conjunto de datos R de la EU-SILC.
+#' @param .anio `numeric`. Año de la encuesta.
+#'
+#' @returns Nada.
 informar_insumos_personas <- function(.P, .D, .R, .anio) {
   if (is.null(.D)) {
     cli::cli_bullets(c(
@@ -65,6 +80,12 @@ informar_insumos_hogares <- function(.D) {
 }
 
 # ============================================================================
+#' Advierte sobre la disponibilidad y ausencia de las variables PL130 y PL230
+#'
+#' @param .P `tibble`. Conjunto de datos P de la EU-SILC.
+#' @param .anio `numeric`. Año de la encuesta.
+#'
+#' @returns Nada.
 informar_disponibilidad_modulos <- function(.P, .anio) {
   anio_lmh <- .anio >= 2020 && (.anio - 2020) %% 3 == 0
   esperada_pl130 <- .anio < 2021 || anio_lmh
