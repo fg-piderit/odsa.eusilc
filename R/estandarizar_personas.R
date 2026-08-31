@@ -91,7 +91,7 @@ estandarizar_personas <- function(
   cli::cli_h1("Estandarizacion")
   advertencias <- obtener_advertencias("P", anio, pais)
   informar_insumos_personas(.P, .D, .R, anio)
-  
+
   .P <- estandarizar_personas_(.P, .R, .D, anio, pais)
 
   if (.flags) {
@@ -143,7 +143,6 @@ estandarizar_personas_ <- function(.P, .R, .D, .anio, .pais) {
   }
 
   .P <- agregar_d_personas(.P, .D)
-
   .P <- estandarizar_paises_personas(.P, .anio, .pais)
   .P <- calcular_auxiliares_personas(.P, .anio)
 
@@ -188,7 +187,6 @@ estandarizar_anio_personas <- function(.P, .anio) {
       PL051B_F = dplyr::if_else(PL032 != 1 | is.na(PL032), PL051_F, -2),
       PL111B_F = -2,
     )
-
   }
 
   return(.P)
@@ -211,7 +209,6 @@ agregar_r_personas <- function(.P, .R) {
       RB280 = NA_integer_,
       RB290 = NA_integer_
     )
-
   } else {
     .P <- dplyr::left_join(
       x = .P,
@@ -243,7 +240,6 @@ agregar_r_personas <- function(.P, .R) {
 agregar_d_personas <- function(.P, .D) {
   if (is.null(.D)) {
     .P <- dplyr::mutate(.P, DB040 = NA_character_)
-
   } else {
     .P <- dplyr::left_join(
       x = .P,
