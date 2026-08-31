@@ -196,15 +196,11 @@ potencialmente relevante:
     Estados Unidos para un gran número de países europeos.
 -   `etiquetas`. El diseño de registro de las bases de datos que
     construyen `expandir_personas` y `expandir_hogares`.
--   `advertencias_estandarizacion`. Pérdidas de información, problemas UDB y
+-   `tabla_advertencias`. Pérdidas de información, problemas UDB y
     diferencias de comparabilidad documentadas para las variables que usa el
     paquete.
--   `cobertura_advertencias`. Países y años incluidos en la revisión
+-   `tabla_cobertura`. Países y años incluidos en la revisión
     documental de las advertencias.
-
-Las advertencias correspondientes a una base concreta también se pueden
-consultar con `consultar_advertencias()`.
-
 
 # Ejemplo de uso
 
