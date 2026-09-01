@@ -1,4 +1,24 @@
 # ============================================================================
+#' Muestra las advertencias correspondientes al país, año y tipo de base suministrada
+#'
+#' @param .datos `tibble`. Conjunto de datos EU-SICL expandido o estandarizado.
+#'
+#' @returns `tibble`. Conjunto de datos con información sobre las advertencias.
+#' @export
+ver_advertencias <- function(.datos) {
+  advertencias <- attr(.datos, "advertencias", exact = TRUE)
+
+  if (is.null(advertencias)) {
+    rlang::abort(
+      "El objeto no tiene informacion sobre advertencias.",
+      class = "advertencias_no_disponibles"
+    )
+  }
+
+  return(advertencias)
+}
+
+# ============================================================================
 #' Obtiene las advertencias correspondientes a un país, año y tipo de base
 #'
 #' @param .base `character`. Tipo de base, 'P' o 'H'.
@@ -20,7 +40,8 @@ obtener_advertencias <- function(.base, .anio, .pais) {
 
     cli::cli_bullets(c(
       "!" = "Se encontraron {cantidad} advertencia{?s} documentada{?s} para {(.pais)} en {(.anio)}.",
-      "i" = "Variables afectadas: {variables}."
+      "i" = "Variables afectadas: {variables}.",
+      " " = "Para mas detalle, se puede usar `ver_advertencias(base)`."
     ))
   } else {
     cobertura <- dplyr::filter(
@@ -70,6 +91,12 @@ informar_insumos_personas <- function(.P, .D, .R, .anio) {
   informar_disponibilidad_modulos(.P, .anio)
 }
 
+# ============================================================================
+#' Advierte la pérdida de variables ante la falta de insumos
+#'
+#' @param .D `tibble`. Conjunto de datos D de la EU-SILC.
+#'
+#' @returns Nada.
 informar_insumos_hogares <- function(.D) {
   if (is.null(.D)) {
     cli::cli_bullets(c(
